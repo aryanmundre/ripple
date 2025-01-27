@@ -4,6 +4,11 @@ import { useRouter } from 'expo-router';
 
 const TestComponent =() => {
   const router = useRouter();
+  const [text, setText] = useState('are you feeling lucky');
+
+  const handleChange = (input) => {
+    setText(input);
+  }
 
   return(
     <View>
@@ -12,8 +17,8 @@ const TestComponent =() => {
         <Text>Ready to do good</Text>
 
         <TextInput
-          value='typing...'
-          onChange={() => {}}
+          value={text}
+          onChangeText={(text) => {handleChange(text)}}
           placeholder="are you feeling lucky"
         />
 
