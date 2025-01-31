@@ -52,7 +52,31 @@ const styles = StyleSheet.create({
         fontFamily: FONT.bold,
         fontSize: SIZES.medium,
         color: COLORS.primary
-    }
+    },   
+    
+    card: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        elevation: 3, // for Android shadow
+        shadowColor: '#000', // iOS shadow
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        margin: 10,
+        padding: 20,
+    },
+    cardContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    cardTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    cardDescription: {
+        fontSize: 14,
+        color: 'gray',
+    },
 });
 
 export default styles;
