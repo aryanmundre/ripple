@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'custom_auth',
+    'actions',
+    'gamification',
 ]
 
 MIDDLEWARE = [
@@ -83,13 +85,15 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'auth_db',
-        'USER': 'auth_user',
+        'NAME': 'ripple_db',
+        'USER': 'postgres',
         'PASSWORD': 'password',
         'HOST': 'localhost',
         'PORT': '5432',
     }
 }
+AUTH_USER_MODEL = 'custom_auth.CustomUser'
+
 
 
 

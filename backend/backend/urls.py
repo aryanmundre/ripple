@@ -18,5 +18,20 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),  
+#    path('api/', include('api.urls')),  # Routes all API traffic to `api/urls.py`
 ]
+
+"""
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('actions.urls')),
+]
+# backend/urls.py
+urlpatterns += [
+    path('', include('gamification.urls')),
+]
+urlpatterns += [
+    path('', include('actions.urls')),
+]
+"""
