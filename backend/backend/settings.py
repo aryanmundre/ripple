@@ -85,11 +85,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ripple_db',
+        'NAME': 'Ripple',
         'USER': 'postgres',
-        'PASSWORD': 'password',
+        'PASSWORD': '1234',
         'HOST': 'localhost',
-        'PORT': '5432',
+        'PORT': '5433',
     }
 }
 AUTH_USER_MODEL = 'custom_auth.CustomUser'

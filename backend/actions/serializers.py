@@ -5,7 +5,7 @@ from .models import UserAction
 class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
-        fields = ['id', 'name', 'description', 'category', 'created_at']
+        fields = ['id', 'name','organization','description', 'category', 'created_at']
 
 class UserActionSerializer(serializers.ModelSerializer):
     class Meta:
