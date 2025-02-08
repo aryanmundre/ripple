@@ -1,13 +1,15 @@
-from rest_framework.generics import ListAPIView
-from .models import Action
-from .serializers import ActionSerializer
-
+from rest_framework import generics, permissions, filters
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+from django.db.models import Count
+from .models import Action, TrendingLog, UserAction
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import UserAction
-from .serializers import UserActionSerializer
+from .serializers import UserActionSerializer, ActionDetailSerializer, ActionListSerializer
+from .recommendations import get_recommendations, ActionSerializer, GamificationDataSerializer
 
 class UserActionView(APIView):
     """
@@ -49,3 +51,103 @@ class UserActionView(APIView):
 class ActionFeedView(ListAPIView):
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
+
+class ActionByOrganizationView(ListAPIView):
+    """
+    API to fetch actions filtered by organization.
+    """
+    serializer_class = ActionSerializer
+    queryset = Action.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['organization']  # Enables filtering by organization
+
+    def get_queryset(self):
+        """
+        Optionally filters the queryset based on an organization query parameter.
+        """
+        organization = self.request.query_params.get('organization', None)
+        if organization:
+            return Action.objects.filter(organization=organization)
+        return super().get_queryset()
+    
+class ActionByCategoryView(ListAPIView):
+    """
+    API to fetch actions filtered by category.
+    """
+    serializer_class = ActionSerializer
+    queryset = Action.objects.all()
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    filterset_fields = ['category']  # Enables filtering by category
+
+    def get_queryset(self):
+        """
+        Optionally filters the queryset based on a category query parameter.
+        """
+        category = self.request.query_params.get('category', None)
+        if category:
+            return Action.objects.filter(category=category)
+        return super().get_queryset()
+
+class UserActionListView(APIView):
+    """
+    Retrieves all the actions that a specific user has completed
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user_actions = UserAction.objects.filter(user=request.user)
+        serializer = UserActionSerializer(user_actions, many = True)
+        return Response(serializer.data)
+    
+
+class RemoveUserActionView(APIView):
+    """
+    API to delete a user action
+    """
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+        action_id = request.data.get("action_id")
+        interaction_type = request.data.get("interaction_type")
+        try:
+            user_action = UserAction.objects.get(user=user, action_id=action_id, interaction_type=interaction_type)
+            user_action.delete()
+            return Response({"message" : f"Action {interaction_type} was removed successfully."}, status.HTTP_200_OK)
+        except UserAction.DoesNotExist:
+            return Response({"error" : "Interaction was not found"}, status.HTTP_404_NOT_FOUND)
+
+class ActionDetailView(RetrieveAPIView):
+    """
+    API to retrieve detailed information about an action
+    """
+    queryset = Action.objects.all()
+    serializer_class = ActionDetailSerializer
+    lookup_field = "id"
+
+        
+class RecommendationActionListView(APIView):
+    """
+    API to get a list of actions sorted by the recommendation algorithm
+    """
+    
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        trending_counts = {} # Set to empty for testing purposes
+        recommended_actions = get_recommendations(user, trending_counts)
+        serializer = ActionListSerializer(recommended_actions, many = True)
+        return Response(serializer.data)
+
+class GamificationDataView(APIView):
+    """
+    API to fetch gamification data for the logged-in user.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        serializer = GamificationDataSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)

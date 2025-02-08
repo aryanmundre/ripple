@@ -18,6 +18,7 @@ class CustomUser(AbstractUser):
     # Social features
     badges_earned = models.JSONField(default=list)  # List of badge IDs the user has earned
     ripple_size = models.PositiveIntegerField(default=0)  # Impact size (e.g., how many users they’ve influenced)
-
+    
+    city = models.CharField(max_length=100, null=True, blank=True)  # User's city
     def __str__(self):
         return self.username  # Display username as object name in admin

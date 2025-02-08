@@ -1,11 +1,13 @@
 import math
+import random
 from django.utils import timezone
 from .models import Action, UserAction
 
-def get_recommendations(user, trending_counts, w_completed=0.5, w_liked=0.3, w_trend=0.2,top_n=10):
+def get_recommendations(user, trending_counts, w_completed=0.5, w_liked=0.3, w_trend=0.1, w_recent=0.1, top_n=10):
 
     completed_pref = {}
     liked_pref = {}
+    recent_pref = {}
 
     # Aggregate completed actions.
     completed_interactions = UserAction.objects.filter(user=user, interaction_type=UserAction.COMPLETE)
@@ -16,6 +18,7 @@ def get_recommendations(user, trending_counts, w_completed=0.5, w_liked=0.3, w_t
         completed_pref[cat] = completed_pref.get(cat, 0) + 1
         org = action.organization
         completed_pref[org] = completed_pref.get(org, 0) + 1
+        completed_pref[action.action_type] = completed_pref.get(action.action_type, 0) + 1
         
     # Aggregate liked actions.
     liked_interactions = UserAction.objects.filter(user=user, interaction_type=UserAction.LIKE)
@@ -24,7 +27,10 @@ def get_recommendations(user, trending_counts, w_completed=0.5, w_liked=0.3, w_t
         cat = action.category
         liked_pref[cat] = liked_pref.get(cat, 0) + 1
         org = action.organization
-        completed_pref[org] = completed_pref.get(org, 0) + 1
+        liked_pref[org] = liked_pref.get(org, 0) + 1
+        liked_pref[action.action_type] = liked_pref.get(action.action_type, 0) + 1
+        recent_pref[cat] = recent_pref.get(cat, 0) + 1  # Track recent likes separately
+
     
     # Compute the norms for the two vectors.
     def dict_norm(d):
@@ -32,8 +38,14 @@ def get_recommendations(user, trending_counts, w_completed=0.5, w_liked=0.3, w_t
 
     norm_completed = dict_norm(completed_pref)
     norm_liked = dict_norm(liked_pref)
+    norm_recent = dict_norm(recent_pref)
 
-    # Filter for actions that the user has not interacted with 
+   # Get the user's onboarding preferences if they have no history
+    if not completed_pref and not liked_pref:
+        onboarding_prefs = user.profile.preferences  # Assume profile stores initial preferences
+        completed_pref = {category: 1 for category in onboarding_prefs}
+
+    # Filter for actions the user has not interacted with
     interacted_ids = UserAction.objects.filter(user=user).values_list('action_id', flat=True)
     candidate_actions = Action.objects.exclude(id__in=interacted_ids)
 
@@ -47,47 +59,43 @@ def get_recommendations(user, trending_counts, w_completed=0.5, w_liked=0.3, w_t
 
 
     for action in candidate_actions:
-        features = []
-        cat = action.category
-        features.append(cat)
-        features.append(action.organization)
-
-        # Calculate values for cosine similarities
+        features = [action.category, action.organization, action.action_type]
         candidate_norm = math.sqrt(len(features))
         
-        # Dot products:
-        dot_completed = 0
-        for feature in features:
-            dot_completed += completed_pref.get(feature, 0)
+        # Compute cosine similarities
+        dot_completed = sum(completed_pref.get(f, 0) for f in features)
+        dot_liked = sum(liked_pref.get(f, 0) for f in features)
+        dot_recent = sum(recent_pref.get(f, 0) for f in features)
 
-        dot_liked = 0
-        for feature in features:
-            dot_liked += liked_pref.get(feature, 0)
+        cosine_completed = dot_completed / (norm_completed * candidate_norm) if norm_completed > 0 else 0
+        cosine_liked = dot_liked / (norm_liked * candidate_norm) if norm_liked > 0 else 0
+        cosine_recent = dot_recent / (norm_recent * candidate_norm) if norm_recent > 0 else 0
 
+        # Normalize trend score
+        trend_score = trending_counts.get(action.category, 0) / max_trend
 
-        # Compute cosine similarity for each profile.
-        if norm_completed > 0:
-            cosine_completed = dot_completed / (norm_completed * candidate_norm)
-        else:
-            cosine_completed = 0
-
-        if norm_liked > 0:
-            cosine_liked = dot_liked / (norm_liked * candidate_norm)
-        else:
-            cosine_liked = 0
-
-
-        
-        # Normalize by the max trending count to get a value between 0 and 1.
-        trend_raw = trending_counts.get(cat, 0)
-        trend_score = trend_raw / max_trend
-
-        # combine scores to get total 
-        final_score = w_completed * cosine_completed + w_liked * cosine_liked + w_trend * trend_score
+        # Compute final score with a balance between past & recent behavior
+        final_score = (
+            w_completed * cosine_completed +
+            w_liked * cosine_liked +
+            w_recent * cosine_recent +
+            w_trend * trend_score
+        )
 
         scored_actions.append((action, final_score))
 
-    # sort the values by highest values 
+    # Sort by highest score
     scored_actions.sort(key=lambda tup: tup[1], reverse=True)
-    recommended_actions = [action for action, score in scored_actions[:top_n]]
-    return recommended_actions
+    recommended_actions = [action for action, score in scored_actions]
+
+    # Diversify 20% of recommendations with exploration-based suggestions
+    num_exploration = max(1, len(recommended_actions) // 5)
+    all_categories = set(Action.objects.values_list('category', flat=True))
+    engaged_categories = set(completed_pref.keys())
+    unexplored_categories = list(all_categories - engaged_categories)
+
+    if unexplored_categories:
+        random_exploration = Action.objects.filter(category__in=random.sample(unexplored_categories, min(len(unexplored_categories), num_exploration)))
+        recommended_actions = recommended_actions[:-num_exploration] + list(random_exploration)
+
+    return recommended_actions[:top_n]

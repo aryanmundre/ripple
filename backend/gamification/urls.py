@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import GamificationView
+from .views import GamificationDataView, AwardPointsView
 
 urlpatterns = [
-    path('gamification/', GamificationView.as_view(), name='gamification'),
+    path('gamification/', GamificationDataView.as_view(), name='gamification-data'),
+    path('award-points/', AwardPointsView.as_view(), name='award-points'),
 ]
+

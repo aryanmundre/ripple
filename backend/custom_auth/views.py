@@ -3,6 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from firebase_admin import auth
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+from custom_auth.models import CustomUser
 
 class RegisterView(APIView):
     def post(self, request):
@@ -48,7 +51,7 @@ class LoginView(APIView):
             firebase_user = auth.get_user_by_email(email)
 
             # Ensure user exists in PostgreSQL
-            user_profile = get_object_or_404(UserProfile, firebase_uid=firebase_user.uid)
+            user_profile = get_object_or_404(CustomUser, firebase_uid=firebase_user.uid)
 
             # Generate custom token for frontend
             custom_token = auth.create_custom_token(firebase_user.uid)

@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .views import RegisterView, VerifyTokenView, LogoutView
+from django.urls import path  #  Import path
+from .views import RegisterView, VerifyTokenView, LogoutView, LoginView
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
