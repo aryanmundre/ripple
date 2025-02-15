@@ -1,6 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class GamificationView(APIView):
     permission_classes = [IsAuthenticated]
@@ -29,6 +31,10 @@ class GamificationDataView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_summary="Fetch gamification data and available rewards",
+        responses={200: "Gamification data fetched successfully"}
+    )
     def get(self, request):
         gamification_profile = request.user.gamification
         gamification_profile.update_streak()  # Update streak if applicable
@@ -53,6 +59,10 @@ class AwardPointsView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_summary="Award points for completing an action",
+        responses={200: "Points awarded successfully"}
+    )
     def post(self, request):
         user = request.user
         gamification_profile = user.gamification

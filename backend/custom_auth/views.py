@@ -57,6 +57,22 @@ class RegisterView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
+    @swagger_auto_schema(
+        operation_summary="Login a user",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['email', 'password'],
+            properties={
+                'email': openapi.Schema(type=openapi.TYPE_STRING, description='User email'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description='User password')
+            }
+        ),
+        responses={
+            200: openapi.Response(description="Login successful"),
+            400: "Invalid request body",
+            404: "User not found"
+        }
+    )
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
@@ -89,6 +105,21 @@ class LoginView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 class VerifyTokenView(APIView):
+    @swagger_auto_schema(
+        operation_summary="Verify a user's ID token",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['id_token'],
+            properties={
+                'id_token': openapi.Schema(type=openapi.TYPE_STRING, description='User ID token')
+            }
+        ),
+        responses={
+            200: openapi.Response(description="Token is valid"),
+            400: "Invalid request body",
+            401: "Invalid token"
+        }
+    )
     def post(self, request):
         id_token = request.data.get('id_token')
 
@@ -103,6 +134,20 @@ class VerifyTokenView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 
 class LogoutView(APIView):
+    @swagger_auto_schema(
+        operation_summary="Logout a user",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['uid'],
+            properties={
+                'uid': openapi.Schema(type=openapi.TYPE_STRING, description='User ID')
+            }
+        ),
+        responses={
+            200: openapi.Response(description="User logged out successfully"),
+            400: "Invalid request body"
+        }
+    )
     def post(self, request):
         uid = request.data.get('uid')
 
