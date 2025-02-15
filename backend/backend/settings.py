@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'actions',
     'gamification',
     'django_filters',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -88,11 +89,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ripple_db',
+        'NAME': 'Ripple',
         'USER': 'postgres',
-        'PASSWORD': 'password123',
+        'PASSWORD': '1234',
         'HOST': 'localhost',
-        'PORT': '5432',
+        'PORT': '5433',
     }
 }
 AUTH_USER_MODEL = 'custom_auth.CustomUser'

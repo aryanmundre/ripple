@@ -16,7 +16,7 @@ class UserActionSerializer(serializers.ModelSerializer):
 class ActionListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
-        fields = ['id', 'name', 'thubnail', 'organization', 'category', 'type']
+        fields = ['id', 'name', 'thumbnail', 'organization', 'category', 'action_type']
 
 class TrendingLogSerializer(serializers.ModelSerializer):
     class Meta:

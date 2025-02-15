@@ -8,8 +8,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import UserAction
-from .serializers import UserActionSerializer, ActionDetailSerializer, ActionListSerializer
-from .recommendations import get_recommendations, ActionSerializer, GamificationDataSerializer
+from .serializers import UserActionSerializer, ActionDetailSerializer, ActionListSerializer, GamificationDataSerializer
+from .recommendations import get_recommendations
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 
 class UserActionView(APIView):
     """
@@ -18,6 +21,22 @@ class UserActionView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+            operation_summary="Like, complete, or share an action",
+            request_body=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                required=['action_id', 'interaction_type'],
+                properties={
+                    'action_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Action ID'),
+                    'interaction_type': openapi.Schema(type=openapi.TYPE_STRING, description='Interaction type (like, complete, share)')
+                }
+            ),
+            responses={
+                201: openapi.Response(description="Action interaction created"),
+                400: "Invalid interaction type",
+                404: "Action not found"
+            }
+    )
     def post(self, request):
         """
         Allows users to like, complete, or share an action.
@@ -39,7 +58,11 @@ class UserActionView(APIView):
 
         except Action.DoesNotExist:
             return Response({"error": "Action not found."}, status=status.HTTP_404_NOT_FOUND)
-
+    
+    @swagger_auto_schema(
+        operation_summary="Retrieve all user interactions with actions",
+        responses={200: UserActionSerializer(many=True)}
+    )
     def get(self, request):
         """
         Retrieves all user interactions with actions.
@@ -48,15 +71,13 @@ class UserActionView(APIView):
         serializer = UserActionSerializer(user_actions, many=True)
         return Response(serializer.data)
 
-class ActionFeedView(ListAPIView):
-    queryset = Action.objects.all()
-    serializer_class = ActionSerializer
+
 
 class ActionByOrganizationView(ListAPIView):
     """
     API to fetch actions filtered by organization.
     """
-    serializer_class = ActionSerializer
+    serializer_class = ActionDetailSerializer
     queryset = Action.objects.all()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['organization']  # Enables filtering by organization
@@ -74,11 +95,12 @@ class ActionByCategoryView(ListAPIView):
     """
     API to fetch actions filtered by category.
     """
-    serializer_class = ActionSerializer
+    serializer_class = ActionDetailSerializer
     queryset = Action.objects.all()
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     filterset_fields = ['category']  # Enables filtering by category
 
+    
     def get_queryset(self):
         """
         Optionally filters the queryset based on a category query parameter.
@@ -94,6 +116,10 @@ class UserActionListView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_summary="Retrieve all actions a user has completed",
+        responses={200: UserActionSerializer(many=True)}
+    )
     def get(self, request):
         user_actions = UserAction.objects.filter(user=request.user)
         serializer = UserActionSerializer(user_actions, many = True)
@@ -106,6 +132,21 @@ class RemoveUserActionView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_summary="Remove a user action",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['action_id', 'interaction_type'],
+            properties={
+                'action_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Action ID'),
+                'interaction_type': openapi.Schema(type=openapi.TYPE_STRING, description='Interaction type')
+            }
+        ),
+        responses={
+            200: "Action removed successfully",
+            404: "Interaction was not found"
+        }
+    )
     def delete(self, request):
         user = request.user
         action_id = request.data.get("action_id")
@@ -133,6 +174,10 @@ class RecommendationActionListView(APIView):
     
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_summary="Retrieve recommended actions",
+        responses={200: ActionListSerializer(many=True)}
+    )
     def get(self, request):
         user = request.user
 
@@ -147,6 +192,10 @@ class GamificationDataView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_summary="Retrieve gamification data",
+        responses={200: GamificationDataSerializer()}
+    )
     def get(self, request):
         user = request.user
         serializer = GamificationDataSerializer(user)

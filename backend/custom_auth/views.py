@@ -6,8 +6,26 @@ from firebase_admin import auth
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from custom_auth.models import CustomUser
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class RegisterView(APIView):
+    @swagger_auto_schema(
+        operation_summary="Register a new user",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['email', 'password'],
+            properties={
+                'email': openapi.Schema(type=openapi.TYPE_STRING, description='User email'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description='User password'),
+                'display_name': openapi.Schema(type=openapi.TYPE_STRING, description='User display name')
+            }
+        ),
+        responses={
+            201: openapi.Response(description="User created"),
+            400: "Invalid request body"
+        }
+    )
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
