@@ -1,11 +1,11 @@
 import React from 'react';
 import { TouchableOpacity, Text, Image } from 'react-native';
 
-const ScreenHeaderBtn = ({ iconUrl, dimension, handlePress}) => {
+const ScreenHeaderBackBtn = ({ iconUrl, dimension, handlePress}) => {
     return (
         <TouchableOpacity onPress={handlePress}>
             <Text>
-                press me!
+                &lt; back
             </Text>
             {/* <Image
                 source={iconUrl}
@@ -16,4 +16,4 @@ const ScreenHeaderBtn = ({ iconUrl, dimension, handlePress}) => {
     )
 }
 
-export default ScreenHeaderBtn;
+export default ScreenHeaderBackBtn;

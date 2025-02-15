@@ -29,7 +29,7 @@ const Home = () => {
         >
           <Login/>
            <Button title="Go to About" onPress={() => router.push('/about')} />            
-           <Button title="Go to Explore" onPress={() => router.push('/explore')} />
+           <Button title="Go to Explore" onPress={() => router.push('/explore/explorecards')} />
           <TestComponent/>
         </View>
       </ScrollView>

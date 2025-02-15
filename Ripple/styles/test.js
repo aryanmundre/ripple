@@ -53,7 +53,10 @@ const styles = StyleSheet.create({
         fontSize: SIZES.medium,
         color: COLORS.primary
     },   
-    
+    cardList: {
+        paddingBottom: 20,
+        alignItems:'center'
+    },
     card: {
         backgroundColor: 'white',
         borderRadius: 10,
@@ -62,21 +65,28 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 4,
-        margin: 10,
-        padding: 20,
+        margin: '2%',
+        padding: 10, 
+        width: '46%', 
+        height: 100
     },
     cardContent: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     cardTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
+        fontSize: 12,
+        fontWeight: 'semibold',
     },
     cardDescription: {
-        fontSize: 14,
+        fontSize: 10,
         color: 'gray',
     },
+    btnImg: {
+        width: 50,
+        height: 100,
+        resizeMode: 'contain',
+      },
 });
 
 export default styles;

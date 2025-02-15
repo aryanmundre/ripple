@@ -17,8 +17,10 @@ const Layout = () => {
     if(!fontsLoaded) return null;
     return (
         <Stack initialRouteName="home">
-            <Stack.Screen name="home"/>            
-            <Stack.Screen name="about"/>
+            <Stack.Screen name="home"/>   
+            <Stack.Screen name="about" options={{title: 'about us'}}/>
+            <Stack.Screen name="explore/explorecards" options={{title: 'explore'}}/>            
+            <Stack.Screen name="explore/[id]" options={{title: ''}}/>
         </Stack>
     )
 }

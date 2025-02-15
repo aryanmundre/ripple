@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import { TouchableOpacity, View, Text, Image } from 'react-native';
+import { Stack, useRouter } from 'expo-router';
 import styles from '../../styles/test.js';
 
 //based on design: each org card will have a picture, title, profile picture, name, and tags
 const OrgCard = ({ organization }) => {
   //lets say organization is currently an object with a title, header pic, icon, link, organizer, contact info, desciption, and loc coords
+  const router = useRouter();
+  const {id, title, profile_picture, name, headerImage, icon, description} = organization
+  console.log(id, title)
   const handlePress = () => {
-    console.log('cardd was pressed');
+    router.push(`/explore/${id}?title=${title}`)
   }
-  const {title, profile_picture, name, headerImage, icon, description} = organization
   return (
-    <TouchableOpacity style={styles.card} onPress={handlePress}>
+    <TouchableOpacity style={styles.card} onPress={(handlePress)}>
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{title}</Text>
       </View>
@@ -28,13 +31,13 @@ const OrgCard = ({ organization }) => {
       <Image
         source={{uri: organization.headerImage}}
         resizeMode='cover'
-        // style={StyleSheet.btnImg(dimension)}
+        style={styles.btnImg}
       />
       {/* icon image */}
       <Image
         source={{uri: organization.icon}}
         resizeMode='cover'
-        // style={StyleSheet.btnImg(dimension)}
+        style={styles.btnImg}
       />
 
     </TouchableOpacity>
