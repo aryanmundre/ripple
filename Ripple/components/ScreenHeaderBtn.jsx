@@ -5,7 +5,6 @@ const ScreenHeaderBtn = ({ iconUrl, dimension, handlePress}) => {
     return (
         <TouchableOpacity onPress={handlePress}>
             <Text>
-                Press me!
             </Text>
             {/* <Image
                 source={iconUrl}
