@@ -5,6 +5,7 @@
       "expo-router"
     ],
     "name": "Ripple",
-    "slug": "Ripple"
+    "slug": "Ripple",
+    "assetBundlePatterns": ["**/*"]
   }
 }
