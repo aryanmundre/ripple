@@ -1,22 +1,14 @@
 import { useState, useEffect } from 'react';
-import { View, SafeAreaView, Button, ActivityIndicator, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
+import { View, SafeAreaView, ActivityIndicator, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
-import { useFonts } from 'expo-font';
-import { ScreenHeaderBtn } from '../components';
 import { COLORS, SIZES } from "../constants";
 
 const ExploreScreen = () => {
-    const router = useRouter();
+    const navigation = useNavigation();
     const [actions, setActions] = useState([]);
-    const [likedActions, setLikedActions] = useState(new Set());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    const [fontsLoaded] = useFonts({
-        'WorkSans-Regular': require('../assets/fonts/WorkSans-Regular.ttf'),
-        'Roboto-Regular': require('../assets/fonts/Roboto-Regular.ttf'),
-    });
 
     useEffect(() => {
         fetchActions();
@@ -31,7 +23,9 @@ const ExploreScreen = () => {
             const data = await response.json();
             setActions(data);
         } catch (err) {
-            setError(err.message);
+            console.error("Error fetching data:", err.message);
+    
+            // ✅ Explicitly setting fallback data
             setActions([
                 {
                     id: 1,
@@ -63,62 +57,42 @@ const ExploreScreen = () => {
         }
     };
 
-    const toggleLike = (id) => {
-        setLikedActions((prev) => {
-            const newLikes = new Set(prev);
-            if (newLikes.has(id)) {
-                newLikes.delete(id);
-            } else {
-                newLikes.add(id);
-            }
-            return newLikes;
-        });
-    };
-
     const renderItem = ({ item }) => (
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate("OrganizationDetails", { id: item.id })}>
             <Image source={{ uri: item.thumbnail }} style={styles.image} />
             <View style={styles.infoContainer}>
                 <Text style={styles.title}>{item.name}</Text>
                 <Text style={styles.provider}>{item.organization}</Text>
                 <Text style={styles.category}>{item.category}</Text>
             </View>
-            <TouchableOpacity onPress={() => toggleLike(item.id)} style={styles.likeButton}>
-                <FontAwesome name={likedActions.has(item.id) ? "star" : "star-o"} size={24} color={likedActions.has(item.id) ? "gold" : "gray"} />
-            </TouchableOpacity>
         </TouchableOpacity>
     );
 
-    return(
-      <SafeAreaView style={{flex: 1, backgroundColor: COLORS.lightWhite}}>
-        <Stack.Screen 
-          options={{
-            headerStyle: { backgroundColor: COLORS.lightWhite},
-            headerShadowVisible: false,
-            headerLeft: () => (
-              <ScreenHeaderBtn/>
-            )
-          }}
-        />
-
-        <FlatList
-          contentContainerStyle={{ padding: SIZES.medium }}
-          data={actions}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderItem}
-          showsVerticalScrollIndicator={false}
-          ListHeaderComponent={
-            <>
-              {loading && <ActivityIndicator size="large" color={COLORS.primary} />}
-              {error && <Text style={styles.error}>{error} - Using fallback data</Text>}
-            </>
-          }
-        />
-      </SafeAreaView>
-    )
+    return (
+        <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.lightWhite }}>
+            {loading ? (
+                <ActivityIndicator size="large" color={COLORS.primary} />
+            ) : actions.length === 0 ? (
+                <Text style={styles.error}>No actions available.</Text>
+            ) : (
+                <FlatList
+                    contentContainerStyle={{ padding: SIZES.medium }}
+                    data={actions}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={renderItem}
+                    showsVerticalScrollIndicator={false}
+                />
+            )}
+        </SafeAreaView>
+    );
+    
 };
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1, // ✅ Ensures full height
+        backgroundColor: COLORS.lightWhite,
+    },
     card: {
         backgroundColor: '#FFF',
         borderRadius: 12,
@@ -145,27 +119,16 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 18,
-        fontFamily: 'WorkSans-Regular',
     },
     provider: {
         fontSize: 14,
-        fontFamily: 'Roboto-Regular',
         color: '#666',
         marginTop: 4,
     },
     category: {
         fontSize: 12,
-        fontFamily: 'Roboto-Regular',
         color: '#007AFF',
         marginTop: 2,
-    },
-    likeButton: {
-        padding: 10,
-    },
-    error: {
-        color: 'red',
-        textAlign: 'center',
-        marginTop: 20,
     },
 });
 
