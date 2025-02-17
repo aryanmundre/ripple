@@ -7,6 +7,7 @@ import ExploreScreen from '../explore';
 import VisualizationScreen from '../visualizationScreen';
 import LeaderboardScreen from '../leaderboardScreen';
 import ProfileScreen from '../profileScreen';
+import OrganizationDetails from '../organizationDetails'; 
 
 // Import SVG icons for bottom tabs
 import SvgExplore from '../../assets/icons/Compass.svg';
@@ -15,9 +16,17 @@ import SvgGame from '../../assets/icons/Game.svg';
 import SvgProfile from '../../assets/icons/Profile.svg';
 
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
+const ExploreStack = createStackNavigator();
 
-// ✅ Bottom Tab Navigator (Handles Navbar)
+// Stack Navigator inside the "Explore" tab (Keeps Navbar Visible)
+const ExploreNavigator = () => (
+    <ExploreStack.Navigator screenOptions={{ headerShown: false }}>
+        <ExploreStack.Screen name="ExploreHome" component={ExploreScreen} />
+        <ExploreStack.Screen name="OrganizationDetails" component={OrganizationDetails} />
+    </ExploreStack.Navigator>
+);
+
+// Bottom Tab Navigator (Handles Navbar)
 const TabNavigator = () => (
     <Tab.Navigator
         screenOptions={{
@@ -28,7 +37,7 @@ const TabNavigator = () => (
             headerShown: false,
         }}
     >
-        <Tab.Screen name="Explore" component={ExploreScreen} options={{
+        <Tab.Screen name="Explore" component={ExploreNavigator} options={{
             tabBarIcon: ({ size, color }) => <SvgExplore width={size} height={size} fill={color} />
         }} />
         <Tab.Screen name="Visualization" component={VisualizationScreen} options={{
@@ -43,21 +52,19 @@ const TabNavigator = () => (
     </Tab.Navigator>
 );
 
-// ✅ Ensure Fullscreen Layout by Wrapping StackNavigator
+// App Navigator (Root Navigation Container)
 const AppNavigator = () => (
     <NavigationContainer>
         <View style={styles.container}>
-            <Stack.Navigator screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="MainTabs" component={TabNavigator} />
-            </Stack.Navigator>
+            <TabNavigator />
         </View>
     </NavigationContainer>
 );
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1, // ✅ Ensures full height
-        backgroundColor: COLORS.lightWhite, // ✅ Consistent background
+        flex: 1,
+        backgroundColor: COLORS.lightWhite,
     },
 });
 
