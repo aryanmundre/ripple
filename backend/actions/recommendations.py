@@ -4,7 +4,10 @@ from django.utils import timezone
 from .models import Action, UserAction
 
 def get_recommendations(user, trending_counts, w_completed=0.5, w_liked=0.3, w_trend=0.1, w_recent=0.1, top_n=10):
-
+    """
+    Generate personalized action recommendations for a user.
+    Falls back to trending/popular actions if the user has insufficient data.
+    """
     completed_pref = {}
     liked_pref = {}
     recent_pref = {}
@@ -31,6 +34,9 @@ def get_recommendations(user, trending_counts, w_completed=0.5, w_liked=0.3, w_t
         liked_pref[action.action_type] = liked_pref.get(action.action_type, 0) + 1
         recent_pref[cat] = recent_pref.get(cat, 0) + 1  # Track recent likes separately
 
+    # If no interaction data, use fallback recommendations
+    if not completed_pref and not liked_pref:
+        return get_fallback_recommendations(top_n)
     
     # Compute the norms for the two vectors.
     def dict_norm(d):
@@ -98,4 +104,22 @@ def get_recommendations(user, trending_counts, w_completed=0.5, w_liked=0.3, w_t
         random_exploration = Action.objects.filter(category__in=random.sample(unexplored_categories, min(len(unexplored_categories), num_exploration)))
         recommended_actions = recommended_actions[:-num_exploration] + list(random_exploration)
 
+    # If no good recommendations, use fallback
+    if not recommended_actions:
+        return get_fallback_recommendations(top_n)
+    
     return recommended_actions[:top_n]
+
+def get_fallback_recommendations(top_n=10):
+    """
+    Returns fallback recommendations (trending or most popular actions).
+    """
+    trending_actions = Action.objects.filter(
+        category__in=TrendingLog.objects.values_list('name', flat=True)
+    ).order_by("-created_at")[:top_n]
+
+    if trending_actions:
+        return list(trending_actions)
+
+    # If no trending actions, return most recently created actions
+    return list(Action.objects.all().order_by("-created_at")[:top_n])

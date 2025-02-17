@@ -9,10 +9,34 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import UserAction
 from .serializers import UserActionSerializer, ActionDetailSerializer, ActionListSerializer, GamificationDataSerializer
-from .recommendations import get_recommendations
+from .recommendations import get_recommendations, get_fallback_recommendations
+from rest_framework.pagination import PageNumberPagination
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
+class ActionPagination(PageNumberPagination):
+    """
+    Custom pagination for the action feed.
+    """
+    page_size = 10  # Default page size
+    page_size_query_param = "page_size"
+    max_page_size = 50  # Limit max number of results
+
+class ActionFeedView(ListAPIView):
+    """
+    API to fetch actions efficiently for the explore page.
+    Supports filtering, sorting, and pagination.
+    """
+    queryset = (
+        Action.objects.select_related("organization")  # Optimizes foreign key lookups
+        .prefetch_related("user_interactions")  # Optimizes many-to-many relationships
+        .order_by("-created_at")
+    )
+    serializer_class = ActionListSerializer
+    pagination_class = ActionPagination
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ["category", "organization", "action_type"]
+    ordering_fields = ["created_at", "name"]
 
 class UserActionView(APIView):
     """
@@ -169,9 +193,8 @@ class ActionDetailView(RetrieveAPIView):
         
 class RecommendationActionListView(APIView):
     """
-    API to get a list of actions sorted by the recommendation algorithm
+    API to get a list of actions sorted by the recommendation algorithm.
     """
-    
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
@@ -181,10 +204,17 @@ class RecommendationActionListView(APIView):
     def get(self, request):
         user = request.user
 
-        trending_counts = {} # Set to empty for testing purposes
+        trending_counts = {log.name: log.score for log in TrendingLog.objects.all()}
+
         recommended_actions = get_recommendations(user, trending_counts)
-        serializer = ActionListSerializer(recommended_actions, many = True)
-        return Response(serializer.data)
+
+        # If no recommendations, use fallback
+        if not recommended_actions:
+            recommended_actions = get_fallback_recommendations()
+
+        serializer = ActionListSerializer(recommended_actions, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class GamificationDataView(APIView):
     """
