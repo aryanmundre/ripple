@@ -1,10 +1,9 @@
 {
   "expo": {
     "scheme": "acme",
-    "plugins": [
-      "expo-router"
-    ],
+    "plugins": [],
     "name": "Ripple",
-    "slug": "Ripple"
+    "slug": "Ripple",
+    "assetBundlePatterns": ["**/*"]
   }
 }
