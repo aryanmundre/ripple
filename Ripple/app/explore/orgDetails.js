@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { View, Image, Text, ScrollView, SafeAreaView, Button, ActivityIndicator } from 'react-native';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import { TestComponent, Login, ScreenHeaderBackBtn, OrgCard } from '../../components';
 import { COLORS, icons, images, SIZES } from "../../constants";
 import styles from '../../styles/test.js';
 
 const OrgPage = () => {
-    const router = useRouter();
-    const { id, title } = useLocalSearchParams();
+    const route = useRoute();
+    const {id, title} = route.params;
 
     const [loading, setLoading] = useState(true);
     const [org, setOrg] = useState({});
@@ -31,7 +31,7 @@ const OrgPage = () => {
 
     return(
       <SafeAreaView style={{flex: 1, backgroundColor: COLORS.lightWhite}}>
-        <Stack.Screen 
+        {/* <Stack.Screen 
           options={{
             headerStyle: { backgroundColor: COLORS.lightWhite},
             headerShadowVisible: false,
@@ -40,9 +40,7 @@ const OrgPage = () => {
               <ScreenHeaderBackBtn handlePress={()=> router.back()}/>
             )
           }}
-        />
-
-        
+        /> */}
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style = {{flex: 1, padding: SIZES.medium}}>
             {
@@ -55,8 +53,8 @@ const OrgPage = () => {
                   resizeMode='cover'
                   style={styles.btnImg}
                 />
-                <Text style={{ fontSize: 36, fontWeight: 'semi-bold' }}>{org.title}</Text>
-                <Text style={{ fontSize: 20, marginVertical: 10 }}>{org.name}</Text>
+                <Text style={{ fontSize: 36, fontWeight: 'semi-bold' }}>{id}</Text>
+                <Text style={{ fontSize: 20, marginVertical: 10 }}>{title}</Text>
 
               </View>
                 )

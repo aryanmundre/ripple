@@ -4,6 +4,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { View, StyleSheet } from 'react-native';
 import { COLORS } from "../../constants";
 import ExploreScreen from '../explore';
+import ExploreCards from '../explore/exploreCards';
+import OrgDetails from '../explore/orgDetails'
 import VisualizationScreen from '../visualizationScreen';
 import LeaderboardScreen from '../leaderboardScreen';
 import ProfileScreen from '../profileScreen';
@@ -21,8 +23,8 @@ const ExploreStack = createStackNavigator();
 // Stack Navigator inside the "Explore" tab (Keeps Navbar Visible)
 const ExploreNavigator = () => (
     <ExploreStack.Navigator screenOptions={{ headerShown: false }}>
-        <ExploreStack.Screen name="ExploreHome" component={ExploreScreen} />
-        <ExploreStack.Screen name="OrganizationDetails" component={OrganizationDetails} />
+        <ExploreStack.Screen name="ExploreHome" component={ExploreCards} />
+        <ExploreStack.Screen name="OrgDetails" component={OrgDetails} />
     </ExploreStack.Navigator>
 );
 
