@@ -43,6 +43,7 @@
     "@babel/plugin-transform-optional-catch-binding": "^7.25.9",
     "@babel/plugin-transform-optional-chaining": "^7.25.9",
     "@types/react": "~18.3.12",
+    "@types/react-native": "^0.72.8",
     "glob": "^11.0.1",
     "react-native-svg-transformer": "^1.5.0",
     "rimraf": "^6.0.1",
