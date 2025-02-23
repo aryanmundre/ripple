@@ -1,191 +1,175 @@
 import React from "react";
-import { SafeAreaView, View, ScrollView, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { SvgXml } from "react-native-svg"; // Import SvgXml to render SVG
+import {
+    SafeAreaView,
+    View,
+    Text,
+    Image,
+    TouchableOpacity,
+    StyleSheet,
+    Dimensions,
+} from "react-native";
+import Icon from "react-native-vector-icons/Feather";
+import { useNavigation } from "@react-navigation/native";
+import {
+    useFonts,
+    Judson_700Bold,
+} from "@expo-google-fonts/judson";
+import {
+    MuseoModerno_400Regular,
+} from "@expo-google-fonts/museomoderno";
+import {
+    Lato_500Medium,
+} from "@expo-google-fonts/lato";
 
-export default (props) => {
-    
+const { width, height } = Dimensions.get("window");
+
+export default function LogInSignUp() {
+    const navigation = useNavigation();
+
+    const [fontsLoaded] = useFonts({
+        Judson_700Bold,
+        MuseoModerno_400Regular,
+        Lato_500Medium,
+    });
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollViewContent}>
-                <View style={styles.column}>
-                    <View style={styles.view}>
-                        <View style={styles.view2}></View>
-                    </View>
+            <TouchableOpacity style={styles.backButton}>
+                <Icon name="arrow-left" size={24} color="white" />
+            </TouchableOpacity>
+
+            <Text style={styles.title}>Ripple</Text>
+
+            <View style={styles.welcomeContainer}>
+                <Text style={styles.welcomeText}>Welcome</Text>
+                <Text style={styles.subtitle}>Start the Ripple, change the world</Text>
+            </View>
+
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                    style={styles.signupButton}
+                    onPress={() => navigation.navigate("Signup")}
+                >
+                    <Text style={styles.buttonText}>Sign up</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={styles.loginButton}
+                    onPress={() => navigation.navigate("Login")}
+                >
+                    <Text style={styles.buttonText}>Log In</Text>
+                </TouchableOpacity>
+            </View>
+
+            <View style={styles.socialContainer}>
+                <Text style={styles.socialText}>Or Sign In with</Text>
+                <View style={styles.socialIcons}>
                     <Image
-                        source={{ uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/27700429-4024-4ef2-8527-449fb5173f03" }}
-                        resizeMode={"stretch"}
-                        style={styles.absoluteImage2}
+                        source={{ uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/e88fc034-c7c3-4ebb-b63a-3021c95dc604" }}
+                        style={styles.socialIcon}
+                    />
+                    <Image
+                        source={{ uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/cb655e3f-3bcf-47a7-aeed-cb79608ab556" }}
+                        style={styles.socialIcon}
+                    />
+                    <Image
+                        source={{ uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/d3d0830a-d38b-442a-b404-fb60637ed1b4" }}
+                        style={styles.socialIcon}
                     />
                 </View>
-                <View style={styles.column2}>
-                    <View>
-                        <Text style={styles.text2}>{"Ripple"}</Text>
-
-                        
-                    </View>
-                    <View style={styles.absoluteColumn}>
-                        <Text style={styles.text3}>{"Welcome "}</Text>
-                        <Text style={styles.text4}>{"Start the Ripple, change the world"}</Text>
-                        <View style={styles.view3}>
-                            <TouchableOpacity style={styles.button} onPress={() => alert('Pressed!')}>
-                                <Text style={styles.text5}>{"Sign up"}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.view4}>
-                            <TouchableOpacity style={styles.button2} onPress={() => alert('Pressed!')}>
-                                <Text style={styles.text5}>{"Log In"}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.view5}>
-                            <Text style={styles.text6}>{"Or Sign In with"}</Text>
-                        </View>
-                        <View style={styles.view6}>
-                            <View style={styles.row}>
-                                <Image
-                                    source={{ uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/e88fc034-c7c3-4ebb-b63a-3021c95dc604" }}
-                                    resizeMode={"stretch"}
-                                    style={styles.image2}
-                                />
-                                <Image
-                                    source={{ uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/cb655e3f-3bcf-47a7-aeed-cb79608ab556" }}
-                                    resizeMode={"stretch"}
-                                    style={styles.image2}
-                                />
-                                <Image
-                                    source={{ uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/d3d0830a-d38b-442a-b404-fb60637ed1b4" }}
-                                    resizeMode={"stretch"}
-                                    style={styles.image3}
-                                />
-                            </View>
-                        </View>
-                    </View>
-                </View>
-            </ScrollView>
+            </View>
         </SafeAreaView>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#FFFFFF",
-    },
-    scrollViewContent: {
-        flexGrow: 1,
-        paddingBottom: 230,  // Adds some bottom space to ensure content doesn't get cut off
-    },
-    absoluteColumn: {
-        paddingBottom: 20,  // Adjusted padding to avoid pushing content off screen
         backgroundColor: "#0D408A",
-        borderColor: "#5E27FD",
-        borderWidth: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        paddingHorizontal: '5%',
     },
-    absoluteImage: {
+    backButton: {
         position: "absolute",
-        top: 18,
-        right: -36,
-        width: 185,
-        height: 41,
+        top: '10%',
+        left: '5%',
     },
-    absoluteImage2: {
+    title: {
+        fontSize: 96,
+        fontWeight: "700",
+        fontFamily: "Judson_700Bold",
+        color: "black",
+        textAlign: "center",
         position: "absolute",
-        bottom: -2,
-        left: 13,
-        width: 16,
-        height: 13,
+        top: '17%',
     },
-    button: {
-        width: 291,
+    welcomeContainer: {
+        position: "absolute",
+        top: '50%',
+        left: '10%',
+        right: '10%',
+        alignItems: 'left'
+    },
+    welcomeText: {
+        fontSize: 36,
+        fontFamily: "MuseoModerno_400Regular",
+        color: "white",
+    },
+    subtitle: {
+        fontSize: 16,
+        fontFamily: "Lato_500Medium",
+        fontWeight: "500",
+        color: "white",
+        textAlign: "left",
+        marginTop: 5,
+        lineHeight: 24,
+        letterSpacing: 0.16,
+    },
+    buttonContainer: {
+        position: "absolute",
+        top: '68%',
+        left: '10%',
+        right: '10%',
+    },
+    signupButton: {
         alignItems: "center",
         backgroundColor: "#FFFFFF",
         borderRadius: 30,
         paddingVertical: 18,
+        marginBottom: 14,
     },
-    button2: {
-        width: 291,
+    loginButton: {
         alignItems: "center",
         backgroundColor: "#B8E1EB",
         borderRadius: 30,
         paddingVertical: 18,
+        marginBottom: 30,
     },
-    column: {
-        marginBottom: 115,
-    },
-    column2: {
-        paddingBottom: 230,
-    },
-    image: {
-        height: 480,
-    },
-    image2: {
-        width: 27,
-        height: 27,
-        marginRight: 18,
-    },
-    image3: {
-        width: 27,
-        height: 27,
-    },
-    row: {
-        flexDirection: "row",
-    },
-    text: {
-        color: "#000000",
-        fontSize: 16,
-        fontWeight: "bold",
-        marginLeft: 36,
-    },
-    text2: {
-        color: "#000000",
-        fontSize: 96,
-        fontWeight: "bold",
-        marginLeft: 82,
-    },
-    text3: {
-        color: "#FFFFFF",
-        fontSize: 36,
-        marginTop: 7,
-        marginBottom: 5,
-        marginLeft: 39,
-    },
-    text4: {
-        color: "#FFFFFF",
-        fontSize: 16,
-        fontWeight: "bold",
-        marginBottom: 50,
-        marginLeft: 34,
-    },
-    text5: {
-        color: "#000000",
+    buttonText: {
         fontSize: 20,
+        color: "black",
     },
-    text6: {
-        color: "#FFFFFF",
+    socialContainer: {
+        position: "absolute",
+        top: '89%',
+        alignItems: "center",
+        width: '50%'
+    },
+    socialText: {
         fontSize: 16,
-        fontWeight: "bold",
+        fontFamily: "Lato_500Medium",
+        fontWeight: "500",
+        color: "white",
+        marginBottom: 12,
     },
-    view: {
-        paddingVertical: 19,
+    socialIcons: {
+        flexDirection: "row",
+        justifyContent: 'space-evenly',
+        width: '80%',
     },
-    view2: {
-        paddingVertical: 14,
-        marginRight: 246,
-    },
-    view3: {
-        alignItems: "center",
-        marginBottom: 14,
-    },
-    view4: {
-        alignItems: "center",
-        marginBottom: 25,
-    },
-    view5: {
-        alignItems: "center",
-        marginBottom: 22,
-    },
-    view6: {
-        alignItems: "center",
-        marginBottom: 106,
+    socialIcon: {
+        width: 27,
+        height: 27,
     },
 });

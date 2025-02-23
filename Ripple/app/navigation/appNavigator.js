@@ -8,13 +8,14 @@ import VisualizationScreen from '../visualizationScreen';
 import LeaderboardScreen from '../leaderboardScreen';
 import ProfileScreen from '../profileScreen';
 import OrganizationDetails from '../organizationDetails';
-import SigninScreen from '../signin';
+import LogInSignUp from '../signin';
+import SignupScreen from '../signup';
+import LoginScreen from '../login';
 
 const Tab = createBottomTabNavigator();
 const ExploreStack = createStackNavigator();
 const AuthStack = createStackNavigator();
 
-// Stack Navigator inside the "Explore" tab
 const ExploreNavigator = () => (
     <ExploreStack.Navigator screenOptions={{ headerShown: false }}>
         <ExploreStack.Screen name="ExploreHome" component={ExploreScreen} />
@@ -22,7 +23,6 @@ const ExploreNavigator = () => (
     </ExploreStack.Navigator>
 );
 
-// Bottom Tab Navigator
 const TabNavigator = () => (
     <Tab.Navigator
         screenOptions={{
@@ -40,19 +40,18 @@ const TabNavigator = () => (
     </Tab.Navigator>
 );
 
-// Auth Stack Navigator for Signin
 const AuthNavigator = () => (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-        {/* Define screens using Screen component */}
-        <AuthStack.Screen name="Signin" component={SigninScreen} />
+        <AuthStack.Screen name="Signin" component={LogInSignUp} />
+        <AuthStack.Screen name="Signup" component={SignupScreen} />
+        <AuthStack.Screen name="Login" component={LoginScreen} />
+        
         <AuthStack.Screen name="AppNavigator" component={TabNavigator} />
     </AuthStack.Navigator>
 );
 
-// App Navigator
 const AppNavigator = () => (
     <NavigationContainer>
-        {/* Root Navigation Container */}
         <AuthNavigator />
     </NavigationContainer>
 );
