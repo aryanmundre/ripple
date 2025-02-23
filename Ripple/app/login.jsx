@@ -64,7 +64,7 @@ export default function LogInSignUp() {
 
             if (response.ok) {
                 Alert.alert("Success", "Login Successful!");
-                navigation.navigate("Home"); // Navigate to home screen after successful login
+                navigation.navigate("ExploreScreen"); 
             } else {
                 Alert.alert("Error", data.detail || "Login failed.");
             }
