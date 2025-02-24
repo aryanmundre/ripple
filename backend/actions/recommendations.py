@@ -1,7 +1,7 @@
 import math
 import random
 from django.utils import timezone
-from .models import Action, UserAction
+from .models import Action, UserAction, TrendingLog
 
 def get_recommendations(user, trending_counts, w_completed=0.5, w_liked=0.3, w_trend=0.1, w_recent=0.1, top_n=10):
     """
