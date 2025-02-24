@@ -12,16 +12,11 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { useNavigation } from "@react-navigation/native";
-import {
-    useFonts,
-    Judson_700Bold,
-} from "@expo-google-fonts/judson";
-import {
-    MuseoModerno_400Regular,
-} from "@expo-google-fonts/museomoderno";
-import {
-    Lato_500Medium,
-} from "@expo-google-fonts/lato";
+import {useFonts, Judson_700Bold, } from "@expo-google-fonts/judson";
+import {MuseoModerno_400Regular, } from "@expo-google-fonts/museomoderno";
+import { Lato_500Medium, } from "@expo-google-fonts/lato";
+import { WorkSans_400Regular, } from "@expo-google-fonts/work-sans";
+import SvgWave from "../assets/icons/Wave.svg";  
 
 const { width, height } = Dimensions.get("window");
 
@@ -38,7 +33,11 @@ export default function LogInSignUp() {
         Judson_700Bold,
         MuseoModerno_400Regular,
         Lato_500Medium,
+        WorkSans_400Regular,
     });
+
+
+    
 
     const [showPassword, setShowPassword] = useState(false);
     const [username, setUsername] = useState('');
@@ -77,12 +76,18 @@ export default function LogInSignUp() {
     return (
         <SafeAreaView style={styles.container}>
             {/* Back Button - Navigates to Signup Page */}
-            <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => navigation.navigate("Signin")}
-            >
-                <Icon name="arrow-left" size={24} color="white" />
-            </TouchableOpacity>
+        <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}  // ✅ This makes it go back dynamically
+        >
+            <Icon name="arrow-left" size={24} color="black" />  
+        </TouchableOpacity>
+
+            <View style={styles.topBackground} />
+
+            <View style={styles.waveContainer}>
+            <SvgWave width={width} height={height * 0.70} />
+            </View>
 
             <View style={styles.welcomeContainer}>
                 <Text style={styles.welcomeText}>Welcome Back</Text>
@@ -94,6 +99,7 @@ export default function LogInSignUp() {
                     <TextInput
                         style={styles.input}
                         placeholder="Username"
+                        placeholderTextColor="#A9A9A9"
                         value={username}
                         onChangeText={setUsername}
                     />
@@ -105,6 +111,7 @@ export default function LogInSignUp() {
                     <TextInput
                         style={styles.input}
                         placeholder="Password"
+                        placeholderTextColor="#A9A9A9"
                         value={password}
                         onChangeText={setPassword}
                         secureTextEntry={!showPassword}
@@ -158,18 +165,37 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: '10%',
         left: '5%',
+        zIndex: 10,
     },
     welcomeContainer: {
         position: "absolute",
-        top: '25%',
+        top: '35%',
         alignItems: 'center',
         width: '80%',
+    },
+    topBackground: {
+        position: "absolute",
+        width: "100%",
+        height: "30%", // ✅ Covers the top portion in white
+        backgroundColor: "white",
+        top: 0,
+        left: 0,
+        right: 0,
+    },
+    waveContainer: {
+        position: "absolute",
+        top: "-7%", // ✅ Raised wave higher
+        left: 0,
+        right: 0,
     },
     welcomeText: {
         fontSize: 36,
         fontFamily: "MuseoModerno_400Regular",
         color: "white",
+        lineHeight: 45, // ⬆️ Slightly increased for better spacing
+        top: "5%"
     },
+    
     subtitle: {
         fontSize: 16,
         fontFamily: "Lato_500Medium",
@@ -192,6 +218,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         fontSize: 20,
         color: "#565353",
+        fontFamily: "WorkSans-Regular",
     },
     loginButton: {
         alignItems: "center",
@@ -208,7 +235,7 @@ const styles = StyleSheet.create({
     },
     socialContainer: {
         position: "absolute",
-        top: '80%',
+        top: '88%',
         alignItems: "center",
         width: '80%',
     },
