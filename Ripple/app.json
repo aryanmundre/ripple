@@ -1,9 +1,13 @@
 {
   "expo": {
     "scheme": "acme",
-    "plugins": [],
+    "plugins": [
+      "expo-font"
+    ],
     "name": "Ripple",
     "slug": "Ripple",
-    "assetBundlePatterns": ["**/*"]
+    "assetBundlePatterns": [
+      "**/*"
+    ]
   }
 }
