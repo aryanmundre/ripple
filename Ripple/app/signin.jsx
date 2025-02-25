@@ -37,7 +37,7 @@ export default function LogInSignUp() {
 
             
             <View style={styles.waveContainer}>
-                <SvgWave width={width} height={height * 0.55} />
+                <SvgWave width={width} height={height * 0.55}  />
             </View>
 
             
@@ -172,6 +172,7 @@ const styles = StyleSheet.create({
         fontWeight: "500",
         color: "white",
         marginBottom: 12,
+        letterSpacing: 0.2,
     },
     socialIcons: {
         flexDirection: "row",
