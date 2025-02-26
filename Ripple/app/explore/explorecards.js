@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
-import { View, Text, FlatList, ScrollView, SafeAreaView, Button, ActivityIndicator } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
+import { View, Text, TextInput, FlatList, ScrollView, SafeAreaView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
+// import Orientation from 'react-native-orientation-locker';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { OrgCard } from '../../components';
 import { COLORS, icons, images, SIZES } from "../../constants";
@@ -8,16 +10,19 @@ import * as Font from 'expo-font';
 
 import Container from '../../assets/icons/Container.svg'
 import SearchIcon from '../../assets/icons/Search.svg';
-import FirstWave from '../../assets/background/Light-wave.svg';
-import SecondWave from '../../assets/background/Light-medium-wave.svg';
-import ThirdWave from '../../assets/background/Dark-medium-wave.svg'
-import FourthWave from '../../assets/background/Dark-wave.svg';
+import BackArrow from '../../assets/icons/BackArrow.svg';
+import Waves from '../../assets/background/explore_wave.svg';
 
 const ExploreCards = () => {
   const [actions, setActions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [orgs, setOrgs] = useState({});
+  const [searchMode, setSearchMode] = useState(false)
+  const [search, setSearch] = useState('');
   const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [width, setWidth] = useState(Dimensions.get('window').width)
+  const [height, setHeight] = useState(Dimensions.get('window').height)
+  const searchRef = useRef(null);
 
   const loadFonts = async () => {
     await Font.loadAsync({
@@ -25,10 +30,8 @@ const ExploreCards = () => {
     });
     setFontsLoaded(true);
   };
-  //backend get request --> populate state and fill out cards
-  //based on design: each organization card will have a title, header picture, icon(?), register link, 
-      //organizer, contact information, description, and location coordinates
-      //users will have a favorite system? 
+
+
   
   useEffect(() => {
     // Simulate fetching data from backend or API
@@ -69,44 +72,68 @@ const ExploreCards = () => {
 
       setLoading(false);
     }, 2000); // Simulating a delay for fetching
-  }, []);
+
+    // Orientation.lockToPortrait(); //react native screen lock not compatible with expo-go
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+  }, [fontsLoaded]);
 
   return(
     <SafeAreaView style={{flex: 1, backgroundColor: COLORS.bg_color}}>
       {/* background layer */}
-      <View style={{position: 'absolute', zIndex:-1}}>
-        <FourthWave style={{zIndex:-4, right: 10, bottom: -240, transform:[{rotate: '-2deg'}]}}/>
-        <ThirdWave style={{zIndex:-3, right: 60, bottom: 95, transform:[{rotate: '7deg'}]}}/>
-        <SecondWave style={{zIndex:-2, right: 65, bottom: 420, transform:[{rotate: '-1deg'}]}}/>
-        <FirstWave style={{zIndex:-1, right: 45, bottom: 630}}/>
+      <View style={{position:'absolute', flex: 1, bottom: 0, zIndex:-1}}>
+        <Waves width={width} height={height*0.4}style={{zIndex: 0}}/>
       </View>
 
-      {/* header */}
-      <View style={{alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', marginLeft: 10, marginTop: 5, marginRight: 20, zIndex: 1}}>
-        <Container width={40} height={40}/>
-        <Text style={{fontSize: 36, fontWeight: '600', color: COLORS.lightWhite, fontFamily: 'default-font'}}>Explore</Text>
-        <SearchIcon width={20} height={20}/>
-      </View>
+      {/* search mode */}
+      { searchMode ? 
+        (<>
+          {/* search bar header */}
+          <View style={{flexDirection: 'row', marginLeft: 8, marginTop: 8, marginRight: 15, zIndex: 1}}>
+            <TouchableOpacity onPress={()=>{setSearchMode(false)}}>
+              <BackArrow width={40} height={40} style={{top: 5}}/>
+            </TouchableOpacity>
+            <TextInput
+                style={{ flex: 1, height: 40, margin: '2%', paddingLeft: 6, paddingRight: 6, color: 'rgb(39, 39, 39)', borderColor: 'rgba(153, 72, 72, 0.2)', borderRadius: 10, backgroundColor: COLORS.lightWhite}}
+                placeholder="Search..."
+                placeholderTextColor={'rbg(39, 39, 39'}
+                value={search}
+                ref={searchRef}
+                onChangeText={setSearch} // Update search query when user types
+            />
+          </View>  
+          
+          {/* generated content */}
+        </>)
 
-      {/* main content */}
-      {/* <ScrollView showsVerticalScrollIndicator={true}> */}
-        <View style = {{flex: 1, padding: SIZES.medium, zIndex: 1}}>
-          { loading ? 
-            (<ActivityIndicator size = "large" color = {COLORS.primary} />) : 
-            (
-              <FlatList
-                data={orgs}
-                renderItem={({ item }) => (
-                  <OrgCard key={item.id} organization={item} />
-                )} 
-                keyExtractor={(item) => item.id}
-                numColumns={2} // Automatically creates 2 cards per row
-                contentContainerStyle={styles.cardList}
-              />
-            )
-          }
+        :
+        (<>
+          <View style={{alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', marginLeft: 10, marginTop: 5, marginRight: 20, zIndex: 1}}>
+          <TouchableOpacity>
+            <Container width={40} height={40}/>
+          </TouchableOpacity>
+          <Text style={{fontSize: 36, fontWeight: '600', color: COLORS.lightWhite, fontFamily: 'default-font'}}>Explore</Text>
+          <TouchableOpacity
+            onPress={()=>{ setSearchMode(true); setTimeout(()=> {if(searchRef.current){searchRef.current.focus()}}, 100); }}
+          >
+            <SearchIcon width={20} height={20}/>
+          </TouchableOpacity>
         </View>
-      {/* </ScrollView> */}
+
+        {/* main content */}
+          <View width={width} style = {{flex: 1, zIndex: 1}}>
+            { loading ? (<ActivityIndicator size = "large" color = {COLORS.primary} />) : 
+              (<FlatList
+                  data={orgs}
+                  renderItem={({ item }) => (
+                    <OrgCard key={item.id} width={width} height={height} organization={item} />
+                  )} 
+                  keyExtractor={(item) => item.id}
+                  numColumns={2} // Automatically creates 2 cards per row
+                  columnWrapperStyle={{ justifyContent: 'space-between', width: width}}
+                  contentContainerStyle={{ paddingHorizontal: 0, alignItems: 'center'}}
+              />)}
+          </View>
+        </>)}
     </SafeAreaView>
   )
 }

@@ -54,8 +54,8 @@ const styles = StyleSheet.create({
         color: COLORS.primary
     },   
     cardList: {
-        paddingBottom: 20,
-        alignItems:'center'
+        alignItems:'center',
+        width: '100%'
     },
     card: {
         backgroundColor: 'white',
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 4,
         margin: '2%',
-        padding: 10, 
+        padding: '2.5%', 
         width: '46%', 
         height: 100
     },
