@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
@@ -29,7 +31,12 @@ SECRET_KEY = 'django-insecure-kgo^$swj9!tc9*5(!i-i-eooc9+m_5c^t+2gp3-_9)b9wh__ci
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "ripple-fmd3.onrender.com",  # Add your Render domain
+]
+
 
 
 # Application definition
@@ -43,7 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'rest_framework',
-    'custom_auth',
+    'backend.custom_auth',
     'actions',
     'gamification',
     'django_filters',
@@ -90,8 +97,6 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #        'NAME': BASE_DIR / 'db.sqlite3',
 #    }
 #}
-import os
-import dj_database_url
 DATABASES = {
 #    'default': {
 #        'ENGINE': 'django.db.backends.postgresql',
