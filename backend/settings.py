@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'rest_framework',
-    'backend.custom_auth',
+    'custom_auth',
     'actions',
     'gamification',
     'django_filters',
