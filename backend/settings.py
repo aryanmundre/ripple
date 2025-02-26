@@ -90,16 +90,21 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #        'NAME': BASE_DIR / 'db.sqlite3',
 #    }
 #}
+import os
+import dj_database_url
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Ripple',
-        'USER': 'postgres',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
-        'PORT': '5433',
-    }
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'Ripple',
+#        'USER': 'postgres',
+#        'PASSWORD': '1234',
+#        'HOST': 'localhost',
+#        'PORT': '5433',
+#    }=
+    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
 }
+
+
 AUTH_USER_MODEL = 'custom_auth.CustomUser'
 
 
