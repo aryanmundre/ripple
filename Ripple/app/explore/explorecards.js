@@ -8,6 +8,8 @@ import { COLORS, icons, images, SIZES } from "../../constants";
 import styles from '../../styles/test.js';
 import * as Font from 'expo-font';
 
+import MuseoModerno from '../../assets/fonts/MuseoModerno-SemiBold.ttf;'
+
 import Container from '../../assets/icons/Container.svg'
 import SearchIcon from '../../assets/icons/Search.svg';
 import BackArrow from '../../assets/icons/BackArrow.svg';
@@ -111,7 +113,7 @@ const ExploreCards = () => {
           <TouchableOpacity>
             <Container width={40} height={40}/>
           </TouchableOpacity>
-          <Text style={{fontSize: 36, fontWeight: '600', color: COLORS.lightWhite, fontFamily: 'default-font'}}>Explore</Text>
+          <Text style={{fontSize: 36, fontWeight: '600', color: COLORS.lightWhite, fontFamily: MuseoModerno}}>Explore</Text>
           <TouchableOpacity
             onPress={()=>{ setSearchMode(true); setTimeout(()=> {if(searchRef.current){searchRef.current.focus()}}, 100); }}
           >
