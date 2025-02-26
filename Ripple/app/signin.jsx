@@ -58,6 +58,7 @@ export default function LogInSignUp() {
                     <Text style={styles.buttonText}>Sign up</Text>
                 </TouchableOpacity>
 
+            
                 <TouchableOpacity
                     style={styles.loginButton}
                     onPress={() => navigation.navigate("Login")}
@@ -66,6 +67,14 @@ export default function LogInSignUp() {
                 </TouchableOpacity>
             </View>
 
+           {/* This is  Skip Button that navigates to the Profile Page */}
+             {/* <TouchableOpacity
+                style={styles.skipButton}
+                onPress={() => navigation.navigate("AppNavigator", { screen: "Profile" })
+                }
+            >
+                <Text style={styles.buttonText}>SKIP</Text>
+                </TouchableOpacity>*/} 
             
             <View style={styles.socialContainer}>
                 <Text style={styles.socialText}>Or Sign In with</Text>

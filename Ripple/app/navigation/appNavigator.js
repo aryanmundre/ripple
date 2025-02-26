@@ -11,6 +11,7 @@ import OrganizationDetails from '../organizationDetails';
 import LogInSignUp from '../signin';
 import SignupScreen from '../signup';
 import LoginScreen from '../login';
+import ProfileSettings from '../profileSettings.js';
 
 const Tab = createBottomTabNavigator();
 const ExploreStack = createStackNavigator();
@@ -45,7 +46,7 @@ const AuthNavigator = () => (
         <AuthStack.Screen name="Signin" component={LogInSignUp} />
         <AuthStack.Screen name="Signup" component={SignupScreen} />
         <AuthStack.Screen name="Login" component={LoginScreen} />
-        
+        <AuthStack.Screen name="ProfileSettings" component={ProfileSettings} />
         <AuthStack.Screen name="AppNavigator" component={TabNavigator} />
     </AuthStack.Navigator>
 );

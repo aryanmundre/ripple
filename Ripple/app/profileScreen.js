@@ -4,6 +4,7 @@ import { useFonts } from 'expo-font';
 import { FontAwesome } from '@expo/vector-icons';
 import { COLORS } from '../constants';
 
+
 // Sample Activity Data
 const activities = [
     {
@@ -22,7 +23,7 @@ const activities = [
     },
 ];
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ navigation }) => {
     // Load fonts
     const [fontsLoaded] = useFonts({
         'WorkSans-Regular': require('../assets/fonts/WorkSans-Regular.ttf'),
@@ -64,7 +65,11 @@ const ProfileScreen = () => {
                     <FontAwesome name="user-plus" size={16} color="white" />
                     <Text style={styles.buttonText}>Add Friends</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.editButton}>
+                <TouchableOpacity style={styles.editButton}
+
+                onPress={() => navigation.navigate("ProfileSettings")}> 
+                {/* NAVIGATING TO PROFILE SETTINGS*/}
+
                     <FontAwesome name="pencil" size={16} color="white" />
                     <Text style={styles.buttonText}>Edit</Text>
                 </TouchableOpacity>
