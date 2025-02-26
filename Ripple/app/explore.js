@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { View, SafeAreaView, ActivityIndicator, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import { COLORS, SIZES } from "../constants";
 
 const ExploreScreen = () => {
@@ -8,6 +9,12 @@ const ExploreScreen = () => {
     const [actions, setActions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // Load fonts
+    const [fontsLoaded] = useFonts({
+        'WorkSans-Regular': require('../assets/fonts/WorkSans-Regular.ttf'),
+        'Roboto-Regular': require('../assets/fonts/Roboto-Regular.ttf'),
+    });
 
     useEffect(() => {
         fetchActions();
@@ -70,6 +77,11 @@ const ExploreScreen = () => {
         </TouchableOpacity>
     );
 
+    // Wait for fonts to load before rendering UI
+    if (!fontsLoaded) {
+        return <ActivityIndicator size="large" color={COLORS.primary} />;
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             {loading ? (
@@ -120,9 +132,11 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 18,
+        fontFamily: 'WorkSans-Regular',
     },
     provider: {
         fontSize: 14,
+        fontFamily: 'Roboto-Regular',
         color: '#666',
         marginTop: 4,
     },

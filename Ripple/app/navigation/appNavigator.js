@@ -9,18 +9,15 @@ import OrgDetails from '../explore/orgDetails'
 import VisualizationScreen from '../visualizationScreen';
 import LeaderboardScreen from '../leaderboardScreen';
 import ProfileScreen from '../profileScreen';
-import OrganizationDetails from '../organizationDetails'; 
-
-// Import SVG icons for bottom tabs
-import SvgExplore from '../../assets/icons/Compass.svg';
-import SvgHeart from '../../assets/icons/Heart.svg';
-import SvgGame from '../../assets/icons/Game.svg';
-import SvgProfile from '../../assets/icons/Profile.svg';
+import OrganizationDetails from '../organizationDetails';
+import LogInSignUp from '../signin';
+import SignupScreen from '../signup';
+import LoginScreen from '../login';
 
 const Tab = createBottomTabNavigator();
 const ExploreStack = createStackNavigator();
+const AuthStack = createStackNavigator();
 
-// Stack Navigator inside the "Explore" tab (Keeps Navbar Visible)
 const ExploreNavigator = () => (
     <ExploreStack.Navigator screenOptions={{ headerShown: false }}>
         <ExploreStack.Screen name="ExploreHome" component={ExploreCards} />
@@ -28,7 +25,6 @@ const ExploreNavigator = () => (
     </ExploreStack.Navigator>
 );
 
-// Bottom Tab Navigator (Handles Navbar)
 const TabNavigator = () => (
     <Tab.Navigator
         screenOptions={{
@@ -39,27 +35,26 @@ const TabNavigator = () => (
             headerShown: false,
         }}
     >
-        <Tab.Screen name="Explore" component={ExploreNavigator} options={{
-            tabBarIcon: ({ size, color }) => <SvgExplore width={size} height={size} fill={color} />
-        }} />
-        <Tab.Screen name="Visualization" component={VisualizationScreen} options={{
-            tabBarIcon: ({ size, color }) => <SvgHeart width={size} height={size} fill={color} />
-        }} />
-        <Tab.Screen name="Leaderboard" component={LeaderboardScreen} options={{
-            tabBarIcon: ({ size, color }) => <SvgGame width={size} height={size} fill={color} />
-        }} />
-        <Tab.Screen name="Profile" component={ProfileScreen} options={{
-            tabBarIcon: ({ size, color }) => <SvgProfile width={size} height={size} fill={color} />
-        }} />
+        <Tab.Screen name="Explore" component={ExploreNavigator} />
+        <Tab.Screen name="Visualization" component={VisualizationScreen} />
+        <Tab.Screen name="Leaderboard" component={LeaderboardScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
 );
 
-// App Navigator (Root Navigation Container)
+const AuthNavigator = () => (
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+        <AuthStack.Screen name="Signin" component={LogInSignUp} />
+        <AuthStack.Screen name="Signup" component={SignupScreen} />
+        <AuthStack.Screen name="Login" component={LoginScreen} />
+        
+        <AuthStack.Screen name="AppNavigator" component={TabNavigator} />
+    </AuthStack.Navigator>
+);
+
 const AppNavigator = () => (
     <NavigationContainer>
-        <View style={styles.container}>
-            <TabNavigator />
-        </View>
+        <AuthNavigator />
     </NavigationContainer>
 );
 
