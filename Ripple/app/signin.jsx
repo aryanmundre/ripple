@@ -74,7 +74,7 @@ export default function LogInSignUp() {
                 }
             >
                 <Text style={styles.buttonText}>SKIP</Text>
-                </TouchableOpacity>*/} 
+                </TouchableOpacity> */}
             
             <View style={styles.socialContainer}>
                 <Text style={styles.socialText}>Or Sign In with</Text>
