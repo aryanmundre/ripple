@@ -5,6 +5,10 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)  # Enforce unique emails
     is_verified = models.BooleanField(default=False)  # For email verification
 
+    # Needed for users
+    firebase_uid = models.CharField(max_length=255, blank=True, null=True)
+    display_name = models.CharField(max_length=255, blank=True, null=True)
+
     # Ripple-specific fields
     points = models.PositiveIntegerField(default=0)  # Points earned through actions
     streak_days = models.PositiveIntegerField(default=0)  # Consecutive days of activity

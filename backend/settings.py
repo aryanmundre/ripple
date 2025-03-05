@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 import dj_database_url
+import custom_auth.firebase_config  # This runs the initialization code
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_URL = "/static/"
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
     'gamification',
     'django_filters',
     'drf_yasg',
+    'donations',
 ]
 
 MIDDLEWARE = [
@@ -63,6 +65,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'custom_auth.firebase_auth.FirebaseAuthenticationMiddleware',  # Your Firebase middleware
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -98,15 +101,15 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #    }
 #}
 DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.postgresql',
-#        'NAME': 'Ripple',
-#        'USER': 'postgres',
-#        'PASSWORD': '1234',
-#        'HOST': 'localhost',
-#        'PORT': '5433',
-#    }=
-    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ripple_db',
+        'USER': 'postgres',
+        'PASSWORD': 'password123',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+#    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
 }
 
 

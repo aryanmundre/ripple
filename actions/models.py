@@ -17,6 +17,13 @@ class Action(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Organization(models.Model):
+    name = models.CharField(max_length=100)
+    logo = models.ImageField(upload_to='logos/', null=True, blank=True)
+    
+    def __str__(self):
+        return self.name
 
 def default_trend_expiry():
     return timezone.now() + timedelta(days=7)

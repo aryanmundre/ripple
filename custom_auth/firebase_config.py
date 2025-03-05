@@ -4,25 +4,22 @@ import firebase_admin
 from firebase_admin import credentials, auth
 from dotenv import load_dotenv
 
-# Load environment variables from the .env file
+# Load all environment variables from .env
 load_dotenv()
 
-# Get the path to the Firebase service account key JSON file from the .env file
-firebase_credentials_path = os.getenv("FIREBASE_CREDENTIALS")
+# Retrieve the entire JSON string for Firebase credentials from the environment
+firebase_credentials_json = os.getenv("FIREBASE_CREDENTIALS")
 
-if not firebase_credentials_path:
+if not firebase_credentials_json:
     raise ValueError("FIREBASE_CREDENTIALS not found in .env file")
 
-print("FIREBASE_CREDENTIALS path:", firebase_credentials_path)  # Debugging line
-
 try:
-    with open(firebase_credentials_path, 'r') as f:
-        service_account_info = json.load(f)
-except FileNotFoundError:
-    raise ValueError(f"File not found: {firebase_credentials_path}")
+    # Parse the JSON string into a Python dictionary
+    service_account_info = json.loads(firebase_credentials_json)
 except json.JSONDecodeError as e:
-    raise ValueError(f"Error decoding JSON from file: {e}")
+    raise ValueError(f"Error decoding JSON from environment variable: {e}")
 
-cred = credentials.Certificate(service_account_info)
-firebase_admin.initialize_app(cred)
-
+# Initialize Firebase Admin only if not already initialized
+if not firebase_admin._apps:
+    cred = credentials.Certificate(service_account_info)
+    firebase_admin.initialize_app(cred)

@@ -28,7 +28,8 @@ class ActionFeedView(ListAPIView):
     Supports filtering, sorting, and pagination.
     """
     queryset = (
-        Action.objects.select_related("organization")  # Optimizes foreign key lookups
+#        Action.objects.select_related("organization")  # Optimizes foreign key lookups, removed because caused error
+        Action.objects.all()
         .prefetch_related("user_interactions")  # Optimizes many-to-many relationships
         .order_by("-created_at")
     )

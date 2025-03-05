@@ -12,6 +12,7 @@ class FirebaseAuthenticationMiddleware(MiddlewareMixin):
         if auth_header and auth_header.startswith("Bearer "):
             token = auth_header.split("Bearer ")[1]
             try:
+                print("token", token)
                 decoded_token = firebase_auth.verify_id_token(token)
                 firebase_uid = decoded_token["uid"]
 
