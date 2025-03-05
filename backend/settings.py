@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "ripple-fmd3.onrender.com",  # Add your Render domain
+    "https://ripple-z6px.onrender.com"
 ]
 
 
