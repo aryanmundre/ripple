@@ -13,6 +13,12 @@ import LogInSignUp from '../signin';
 import SignupScreen from '../signup';
 import LoginScreen from '../login';
 
+// Import SVG icons for bottom tabs
+import SvgExplore from '../../assets/icons/Compass.svg';
+import SvgHeart from '../../assets/icons/Heart.svg';
+import SvgGame from '../../assets/icons/Game.svg';
+import SvgProfile from '../../assets/icons/Profile.svg';
+
 const Tab = createBottomTabNavigator();
 const ExploreStack = createStackNavigator();
 const AuthStack = createStackNavigator();
@@ -34,10 +40,18 @@ const TabNavigator = () => (
             headerShown: false,
         }}
     >
-        <Tab.Screen name="Explore" component={ExploreNavigator} />
-        <Tab.Screen name="Visualization" component={VisualizationScreen} />
-        <Tab.Screen name="Leaderboard" component={LeaderboardScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
+        <Tab.Screen name="Explore" component={ExploreNavigator} options={{
+            tabBarIcon: ({ size, color }) => <SvgExplore width={size} height={size} fill={color} />
+        }}/>
+        <Tab.Screen name="Visualization" component={VisualizationScreen}  options={{
+            tabBarIcon: ({ size, color }) => <SvgHeart width={size} height={size} fill={color} />
+        }}/>
+        <Tab.Screen name="Leaderboard" component={LeaderboardScreen}  options={{
+            tabBarIcon: ({ size, color }) => <SvgGame width={size} height={size} fill={color} />
+        }}/>
+        <Tab.Screen name="Profile" component={ProfileScreen} options={{
+            tabBarIcon: ({ size, color }) => <SvgProfile width={size} height={size} fill={color} />
+        }}/>
     </Tab.Navigator>
 );
 
@@ -53,7 +67,8 @@ const AuthNavigator = () => (
 
 const AppNavigator = () => (
     <NavigationContainer>
-        <AuthNavigator />
+        <TabNavigator/>
+        {/* <AuthNavigator /> */}
     </NavigationContainer>
 );
 

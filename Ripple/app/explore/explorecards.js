@@ -8,7 +8,7 @@ import { COLORS, icons, images, SIZES } from "../../constants";
 import styles from '../../styles/test.js';
 import * as Font from 'expo-font';
 
-import MuseoModerno from '../../assets/fonts/MuseoModerno-SemiBold.ttf;'
+// import MuseoModerno from '../../assets/fonts/MuseoModerno-SemiBold.ttf;'
 
 import Container from '../../assets/icons/Container.svg'
 import SearchIcon from '../../assets/icons/Search.svg';
@@ -17,15 +17,16 @@ import Waves from '../../assets/background/explore_wave.svg';
 
 const ExploreCards = () => {
   const [actions, setActions] = useState([]);
+  const [fontsLoaded, setFontsLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [orgs, setOrgs] = useState({});
   const [searchMode, setSearchMode] = useState(false)
   const [search, setSearch] = useState('');
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-  const [width, setWidth] = useState(Dimensions.get('window').width)
-  const [height, setHeight] = useState(Dimensions.get('window').height)
   const searchRef = useRef(null);
 
+  
+  const width = Dimensions.get('window').width;
+  const height= Dimensions.get('window').height;
   const loadFonts = async () => {
     await Font.loadAsync({
       'default-font': require('../../assets/fonts/MuseoModerno-SemiBold.ttf'),
@@ -110,16 +111,16 @@ const ExploreCards = () => {
         :
         (<>
           <View style={{alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', marginLeft: 10, marginTop: 5, marginRight: 20, zIndex: 1}}>
-          <TouchableOpacity>
-            <Container width={40} height={40}/>
-          </TouchableOpacity>
-          <Text style={{fontSize: 36, fontWeight: '600', color: COLORS.lightWhite, fontFamily: MuseoModerno}}>Explore</Text>
-          <TouchableOpacity
-            onPress={()=>{ setSearchMode(true); setTimeout(()=> {if(searchRef.current){searchRef.current.focus()}}, 100); }}
-          >
-            <SearchIcon width={20} height={20}/>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity>
+              <Container width={40} height={40}/>
+            </TouchableOpacity>
+            <Text style={{alignItems: 'center', fontSize: 36, fontWeight: '600', color: COLORS.lightWhite, fontFamily: 'default-font'}}>Explore</Text>
+            <TouchableOpacity
+              onPress={()=>{ setSearchMode(true); setTimeout(()=> {if(searchRef.current){searchRef.current.focus()}}, 100); }}
+            >
+              <SearchIcon width={20} height={20}/>
+            </TouchableOpacity>
+          </View>
 
         {/* main content */}
           <View width={width} style = {{flex: 1, zIndex: 1}}>

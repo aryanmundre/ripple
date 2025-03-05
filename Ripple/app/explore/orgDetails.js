@@ -27,13 +27,17 @@ const OrgPage = () => {
     }, []);
 
     const fetchOrganizationDetails = async () => {
-        const baseURL = ' '; // Change to local IP if using a physical device
+        const baseURL = 'https://ripple-fmd3.onrender.com/api'; // Change to local IP if using a physical device
         // const baseURL = 'http://192.168.1.6:8000/api'
         // const apiURL = `${baseURL}/actions/${id}/`;
-        const apiURL = `${baseURL}/actions/trending`;
+        const apiURL = `${baseURL}/actions/user-actions/`;
 
         try {
-            const response = await fetch(apiURL);
+            const response = await fetch(apiURL, {
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
             if (!response.ok) throw new Error('Failed to fetch data');
             const data = await response.json();
             console.log(data);
