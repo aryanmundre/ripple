@@ -11,7 +11,7 @@ import {
 import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
 import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
 import { useNavigation } from "@react-navigation/native";
-import ProgressBar from "../assets/icons/progressBar3.svg";  
+import ProgressBar from "../assets/icons/progressBar5.svg";  
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";
 import CheckBox from "../assets/icons/checkbox.svg";
@@ -32,10 +32,7 @@ const SkillSelection = () => {
     const [selectedSkills, setSelectedSkills] = useState([]);
     
     const handleNext = () => {
-        navigation.reset({
-            index: 0,
-            routes: [{ name: 'Main' }],
-        });
+        navigation.navigate('VolunteerPreferences');
     };
 
     const toggleSkill = (skillId) => {
@@ -188,7 +185,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 40,
         borderRadius: 30,
         position: 'absolute',
-        top: '72%',
+        top: '80%',
         zIndex: 3,
     },
     nextButtonText: {

@@ -11,7 +11,7 @@ import {
 import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
 import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
 import { useNavigation } from "@react-navigation/native";
-import ProgressBar from "../assets/icons/progressBar3.svg";  
+import ProgressBar from "../assets/icons/progressBar4.svg";  
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";  
 import ImagePlaceholder from "../assets/icons/imageplaceholder.svg";
@@ -32,10 +32,7 @@ const CauseSelection = () => {
     const [selectedCauses, setSelectedCauses] = useState([]);
     
     const handleNext = () => {
-        navigation.reset({
-            index: 0,
-            routes: [{ name: 'Main' }],
-        });
+        navigation.navigate('SkillSelection');
     };
 
     const toggleCause = (causeId) => {
