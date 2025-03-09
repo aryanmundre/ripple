@@ -130,9 +130,8 @@ const ExploreCards = () => {
             </TouchableOpacity>
           </View>
 
-        {/* main content */}
-          { loading ? (<ActivityIndicator size="large" color={COLORS.primary}/>) : renderOrgCards()
-          }
+          {/* main content */}
+          { loading ? (<ActivityIndicator size="large" color={COLORS.primary}/>) : renderOrgCards()}
         </ScrollView>
       )}
     </SafeAreaView>
