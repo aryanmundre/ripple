@@ -101,22 +101,30 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #        'NAME': BASE_DIR / 'db.sqlite3',
 #    }
 #}
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ripple_db',
-        'USER': 'postgres',
-        'PASSWORD': 'password123',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+
+
+# DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'ripple_db',
+#        'USER': 'postgres',
+#        'PASSWORD': 'password123',
+#       'HOST': 'localhost',
+#        'PORT': '5432',
+#    }
 #    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
+#}
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL', 'postgresql://postgres:password123@localhost:5432/ripple_db')
+    )
 }
 
 
+
 AUTH_USER_MODEL = 'custom_auth.CustomUser'
-
-
+#postgresql://ripple_db_user:Zr9MpqzRID0GpXBotkTRztEhdiYvtQRq@dpg-cv4bg77noe9s73c9940g-a/ripple_db_staging
+#postgresql://ripple_db_user:Zr9MpqzRID0GpXBotkTRztEhdiYvtQRq@dpg-cv4bg77noe9s73c9940g-a.oregon-postgres.render.com/ripple_db_staging
 
 
 # Password validation
