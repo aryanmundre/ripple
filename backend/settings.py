@@ -107,7 +107,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #}
 
 
-# DATABASES = {
+#DATABASES = {
 #    'default': {
 #        'ENGINE': 'django.db.backends.postgresql',
 #        'NAME': 'ripple_db',
@@ -123,12 +123,9 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #}
 
 # Get the DATABASE_URL from environment variable
-DATABASE_URL = os.getenv('DATABASE_URL')
-print("DATABASE_URL:", os.environ.get('DATABASE_URL'))
-
 DATABASES = {
     'default': dj_database_url.config(
-        default=DATABASE_URL,
+        default=os.getenv('DATABASE_URL'),
         conn_max_age=600,
         ssl_require=True  # This is important for Render's PostgreSQL
     )
