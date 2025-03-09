@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 import dj_database_url
 #import custom_auth.firebase_config  # This runs the initialization code
 
@@ -114,9 +118,19 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #    }
 #    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
 #}
+#DATABASES = {
+#    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))#, 'postgresql://postgres:password123@localhost:5432/ripple_db')
+#}
+
+# Get the DATABASE_URL from environment variable
+DATABASE_URL = os.getenv('DATABASE_URL')
+print("DATABASE_URL:", os.environ.get('DATABASE_URL'))
+
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL', 'postgresql://postgres:password123@localhost:5432/ripple_db')
+        default=DATABASE_URL,
+        conn_max_age=600,
+        ssl_require=True  # This is important for Render's PostgreSQL
     )
 }
 
