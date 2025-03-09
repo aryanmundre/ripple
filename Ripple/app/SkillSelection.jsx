@@ -1,81 +1,92 @@
-//Third page
 import React, { useState } from 'react';
 import { 
     SafeAreaView, 
     View, 
     Text, 
-    TextInput, 
     StyleSheet, 
     Dimensions,
     Pressable,
+    TouchableOpacity,
 } from 'react-native';
 import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
 import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
 import { useNavigation } from "@react-navigation/native";
-import ProgressBar from "../assets/icons/progressBar.svg";  
+import ProgressBar from "../assets/icons/progressBar3.svg";  
 import Logo from "../assets/icons/logo.svg"; 
-import SvgWave from "../assets/icons/Wave.svg";  
+import SvgWave from "../assets/icons/Wave.svg";
+import CheckBox from "../assets/icons/checkbox.svg";
+import CheckBoxSelected from "../assets/icons/checkbox-selected.svg";
 
 const { width, height } = Dimensions.get('window');
 
-const SignupScreen = () => {
+const skills = [
+    { id: 1, title: "Teaching & Tutoring" },
+    { id: 2, title: "Medical & First Aid" },
+    { id: 3, title: "Public Speaking & Advocacy" },
+    { id: 4, title: "Legal Assistance" },
+    { id: 5, title: "I'm just here to serve kindness!" },
+];
+
+const SkillSelection = () => {
     const navigation = useNavigation();
+    const [selectedSkills, setSelectedSkills] = useState([]);
     
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [preferredName, setPreferredName] = useState('');
+    const handleNext = () => {
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'Main' }],
+        });
+    };
+
+    const toggleSkill = (skillId) => {
+        setSelectedSkills(prev => {
+            if (prev.includes(skillId)) {
+                return prev.filter(id => id !== skillId);
+            }
+            if (prev.length < 3) {
+                return [...prev, skillId];
+            }
+            return prev;
+        });
+    };
 
     let [fontsLoaded] = useFonts({
         MuseoModerno_400Regular,
         WorkSans_400Regular,
     });
 
-    const handleNext = () => {
-        console.log('Next button pressed');
-        navigation.navigate('AccountSetup');
-    };
+    if (!fontsLoaded) {
+        return null;
+    }
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.content}>
-                <Logo width={60} height={60} style={styles.logo}/>
+                <Logo width={55} height={55} style={styles.logo}/>
                 <Text style={styles.title}>Get Started</Text>
                 
                 <View style={styles.progressBarContainer}>
                     <ProgressBar width={274} height={10} />
                 </View>
 
-                <Text style={styles.subtitle}>Tell us your name</Text>
-
                 <View style={styles.inputContainer}>
-                    <View style={styles.inputWrapper}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="First Name"
-                            placeholderTextColor="#A9A9A9"
-                            value={firstName}
-                            onChangeText={setFirstName}
-                        />
-                    </View>
-                    
-                    <View style={styles.inputWrapper}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Last Name"
-                            placeholderTextColor="#A9A9A9"
-                            value={lastName}
-                            onChangeText={setLastName}
-                        />
-                    </View>
+                    <Text style={styles.subtitle}>Do you have any special skills or experience you'd like to offer?</Text>
+                    <Text style={styles.subHeader}>Choose your top 3</Text>
 
-                    <View style={styles.inputWrapper}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Preferred Name"
-                            placeholderTextColor="#A9A9A9"
-                            value={preferredName}
-                            onChangeText={setPreferredName}
-                        />
+                    <View style={styles.skillsContainer}>
+                        {skills.map((skill) => (
+                            <TouchableOpacity
+                                key={skill.id}
+                                style={styles.skillItem}
+                                onPress={() => toggleSkill(skill.id)}
+                            >
+                                {selectedSkills.includes(skill.id) ? 
+                                    <CheckBoxSelected width={24} height={24} style={styles.checkbox} /> :
+                                    <CheckBox width={24} height={24} style={styles.checkbox} />
+                                }
+                                <Text style={styles.skillText}>{skill.title}</Text>
+                            </TouchableOpacity>
+                        ))}
                     </View>
                 </View>
 
@@ -114,51 +125,71 @@ const styles = StyleSheet.create({
         zIndex: 2,
     },
     logo: {
-        marginTop: 40,
-        marginBottom: 10,
+        marginTop: 30,
+        marginBottom: 8,
     },
     title: {
         color: 'white',
-        fontSize: 36,
+        fontSize: 32,
         fontFamily: 'MuseoModerno_400Regular',
-        marginBottom: 20,
+        marginBottom: 15,
     },
     progressBarContainer: {
         width: '100%',
         alignItems: 'center',
-        marginBottom: 30,
+        marginBottom: 35,
     },
     subtitle: {
         color: 'white',
         fontSize: 16,
         fontFamily: 'WorkSans_400Regular',
+        marginBottom: 6,
+        textAlign: 'center',
+    },
+    subHeader: {
+        color: 'white',
+        fontSize: 12,
+        fontFamily: 'WorkSans_400Regular',
         marginBottom: 20,
+        opacity: 0.8,
+        textAlign: 'center',
+        fontStyle: 'italic',
     },
     inputContainer: {
-        width: '100%',
-        paddingHorizontal: 20,
+        width: '90%',
+        paddingBottom: 0,
+        marginBottom: 0,
+        maxHeight: '45%',
     },
-    inputWrapper: {
-        position: 'relative',
-        marginBottom: 15,
+    skillsContainer: {
         width: '100%',
+        gap: 12,
     },
-    input: {
+    skillItem: {
         width: '100%',
-        height: 50,
+        flexDirection: 'row',
+        alignItems: 'center',
         backgroundColor: 'white',
-        borderRadius: 25,
-        paddingHorizontal: 20,
+        borderRadius: 30,
+        padding: 12,
+        marginBottom: 0,
+    },
+    checkbox: {
+        marginRight: 12,
+    },
+    skillText: {
+        color: '#333333',
+        fontSize: 14,
         fontFamily: 'WorkSans_400Regular',
-        fontSize: 16,
     },
     nextButton: {
         backgroundColor: '#5AA8DC',
         paddingVertical: 12,
         paddingHorizontal: 40,
         borderRadius: 30,
-        marginTop: 20,
-        zIndex: 2,
+        position: 'absolute',
+        top: '72%',
+        zIndex: 3,
     },
     nextButtonText: {
         color: 'white',
@@ -188,4 +219,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SignupScreen;
+export default SkillSelection; 

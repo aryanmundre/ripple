@@ -1,43 +1,47 @@
-//Third page
 import React, { useState } from 'react';
 import { 
     SafeAreaView, 
     View, 
     Text, 
     TextInput, 
+    TouchableOpacity, 
     StyleSheet, 
     Dimensions,
     Pressable,
 } from 'react-native';
 import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
-import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
+import { WorkSans_400Regular, WorkSans_600SemiBold, WorkSans_700Bold } from '@expo-google-fonts/work-sans';
 import { useNavigation } from "@react-navigation/native";
-import ProgressBar from "../assets/icons/progressBar.svg";  
+import ProgressBar from "../assets/icons/progressBar3.svg";  
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";  
+import Icon from "react-native-vector-icons/Feather";
 
 const { width, height } = Dimensions.get('window');
 
-const SignupScreen = () => {
+const LocationSetup = () => {
     const navigation = useNavigation();
     
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [preferredName, setPreferredName] = useState('');
+    const handleNext = () => {
+        console.log('Next button pressed');
+        navigation.navigate('CauseSelection');
+    };
 
     let [fontsLoaded] = useFonts({
         MuseoModerno_400Regular,
         WorkSans_400Regular,
+        WorkSans_600SemiBold,
+        WorkSans_700Bold,
     });
 
-    const handleNext = () => {
-        console.log('Next button pressed');
-        navigation.navigate('AccountSetup');
-    };
+    const [streetAddress, setStreetAddress] = useState('');
+    const [city, setCity] = useState('');
+    const [state, setState] = useState('');
+    const [zipCode, setZipCode] = useState('');
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.content}>
+                    <View style={styles.content}>
                 <Logo width={60} height={60} style={styles.logo}/>
                 <Text style={styles.title}>Get Started</Text>
                 
@@ -45,36 +49,49 @@ const SignupScreen = () => {
                     <ProgressBar width={274} height={10} />
                 </View>
 
-                <Text style={styles.subtitle}>Tell us your name</Text>
-
                 <View style={styles.inputContainer}>
+                    <Text style={styles.subtitle}>Location</Text>
+
                     <View style={styles.inputWrapper}>
                         <TextInput
                             style={styles.input}
-                            placeholder="First Name"
+                            placeholder="Street Address"
                             placeholderTextColor="#A9A9A9"
-                            value={firstName}
-                            onChangeText={setFirstName}
+                            value={streetAddress}
+                            onChangeText={setStreetAddress}
                         />
                     </View>
-                    
-                    <View style={styles.inputWrapper}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Last Name"
-                            placeholderTextColor="#A9A9A9"
-                            value={lastName}
-                            onChangeText={setLastName}
-                        />
+
+                    <View style={styles.rowContainer}>
+                        <View style={[styles.inputWrapper, styles.cityWrapper]}>
+                            <TextInput
+                                style={[styles.input, styles.cityInput]}
+                                placeholder="City"
+                                placeholderTextColor="#A9A9A9"
+                                value={city}
+                                onChangeText={setCity}
+                            />
+                        </View>
+
+                        <View style={[styles.inputWrapper, styles.stateWrapper]}>
+                            <TextInput
+                                style={[styles.input, styles.stateInput]}
+                                placeholder="State"
+                                placeholderTextColor="#A9A9A9"
+                                value={state}
+                                onChangeText={setState}
+                            />
+                        </View>
                     </View>
 
                     <View style={styles.inputWrapper}>
                         <TextInput
                             style={styles.input}
-                            placeholder="Preferred Name"
+                            placeholder="Zip code"
                             placeholderTextColor="#A9A9A9"
-                            value={preferredName}
-                            onChangeText={setPreferredName}
+                            value={zipCode}
+                            onChangeText={setZipCode}
+                            keyboardType="numeric"
                         />
                     </View>
                 </View>
@@ -133,6 +150,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: 'WorkSans_400Regular',
         marginBottom: 20,
+        alignSelf: 'flex-start',
     },
     inputContainer: {
         width: '100%',
@@ -151,6 +169,26 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         fontFamily: 'WorkSans_400Regular',
         fontSize: 16,
+    },
+    rowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginBottom: 15,
+    },
+    cityWrapper: {
+        width: '58%',
+        marginBottom: 0,
+    },
+    stateWrapper: {
+        width: '38%',
+        marginBottom: 0,
+    },
+    cityInput: {
+        width: '100%',
+    },
+    stateInput: {
+        width: '100%',
     },
     nextButton: {
         backgroundColor: '#5AA8DC',
@@ -188,4 +226,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SignupScreen;
+export default LocationSetup; 

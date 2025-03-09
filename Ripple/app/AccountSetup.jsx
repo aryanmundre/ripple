@@ -1,4 +1,3 @@
-//Third page
 import React, { useState } from 'react';
 import { 
     SafeAreaView, 
@@ -12,18 +11,20 @@ import {
 import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
 import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
 import { useNavigation } from "@react-navigation/native";
-import ProgressBar from "../assets/icons/progressBar.svg";  
+import ProgressBar from "../assets/icons/progressBar2.svg";  
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";  
+import Icon from "react-native-vector-icons/Feather";
 
 const { width, height } = Dimensions.get('window');
 
-const SignupScreen = () => {
+const AccountSetup = () => {
     const navigation = useNavigation();
     
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [preferredName, setPreferredName] = useState('');
+    const [username, setUsername] = useState('');
+    const [dateOfBirth, setDateOfBirth] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     let [fontsLoaded] = useFonts({
         MuseoModerno_400Regular,
@@ -32,7 +33,7 @@ const SignupScreen = () => {
 
     const handleNext = () => {
         console.log('Next button pressed');
-        navigation.navigate('AccountSetup');
+        navigation.navigate('LocationSetup');
     };
 
     return (
@@ -45,36 +46,50 @@ const SignupScreen = () => {
                     <ProgressBar width={274} height={10} />
                 </View>
 
-                <Text style={styles.subtitle}>Tell us your name</Text>
+                <Text style={styles.subtitle}>Set up your account</Text>
 
                 <View style={styles.inputContainer}>
                     <View style={styles.inputWrapper}>
                         <TextInput
                             style={styles.input}
-                            placeholder="First Name"
+                            placeholder="Username"
                             placeholderTextColor="#A9A9A9"
-                            value={firstName}
-                            onChangeText={setFirstName}
-                        />
-                    </View>
-                    
-                    <View style={styles.inputWrapper}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Last Name"
-                            placeholderTextColor="#A9A9A9"
-                            value={lastName}
-                            onChangeText={setLastName}
+                            value={username}
+                            onChangeText={setUsername}
                         />
                     </View>
 
                     <View style={styles.inputWrapper}>
                         <TextInput
                             style={styles.input}
-                            placeholder="Preferred Name"
+                            placeholder="Date of birth"
                             placeholderTextColor="#A9A9A9"
-                            value={preferredName}
-                            onChangeText={setPreferredName}
+                            value={dateOfBirth}
+                            onChangeText={setDateOfBirth}
+                        />
+                        <Icon name="calendar" size={20} color="#A9A9A9" style={styles.calendarIcon} />
+                    </View>
+
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Email Address"
+                            placeholderTextColor="#A9A9A9"
+                            value={email}
+                            onChangeText={setEmail}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                        />
+                    </View>
+
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Password"
+                            placeholderTextColor="#A9A9A9"
+                            value={password}
+                            onChangeText={setPassword}
+                            secureTextEntry
                         />
                     </View>
                 </View>
@@ -152,6 +167,11 @@ const styles = StyleSheet.create({
         fontFamily: 'WorkSans_400Regular',
         fontSize: 16,
     },
+    calendarIcon: {
+        position: 'absolute',
+        right: 20,
+        top: 15,
+    },
     nextButton: {
         backgroundColor: '#5AA8DC',
         paddingVertical: 12,
@@ -188,4 +208,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SignupScreen;
+export default AccountSetup; 

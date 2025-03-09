@@ -17,6 +17,7 @@ import {MuseoModerno_400Regular, } from "@expo-google-fonts/museomoderno";
 import { Lato_500Medium, } from "@expo-google-fonts/lato";
 import { WorkSans_400Regular, } from "@expo-google-fonts/work-sans";
 import SvgWave from "../assets/icons/Wave.svg";  
+import { API_ENDPOINTS } from "../constants/api";
 
 const { width, height } = Dimensions.get("window");
 
@@ -51,7 +52,7 @@ export default function LogInSignUp() {
         }
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/auth/login/", {
+            const response = await fetch(API_ENDPOINTS.LOGIN, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -62,14 +63,19 @@ export default function LogInSignUp() {
             const data = await response.json();
 
             if (response.ok) {
+                // Store the token if it's returned
+                if (data.token) {
+                    // TODO: Store token in secure storage
+                    console.log("Token received:", data.token);
+                }
                 Alert.alert("Success", "Login Successful!");
-                navigation.navigate("ExploreScreen"); 
+                navigation.navigate("AppNavigator"); // Navigate to main app
             } else {
-                Alert.alert("Error", data.detail || "Login failed.");
+                Alert.alert("Error", data.detail || "Login failed. Please check your credentials.");
             }
         } catch (error) {
-            Alert.alert("Error", "Something went wrong. Please try again.");
             console.error("Login Error:", error);
+            Alert.alert("Error", "Unable to connect to the server. Please try again later.");
         }
     };
 
