@@ -1,20 +1,24 @@
 import { useState } from 'react';
 import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { COLORS, icons, images, SIZES } from "../../constants";
 // import styles from '../../styles/test.js';
 
+import Placeholder from '../../assets/icons/placeholder.svg';
+import Placeholder2 from '../../assets/icons/placeholder2.svg';
 import Star from '../../assets/icons/Star.svg';
 
 //based on design: each org card will have a picture, title, profile picture, name, and tags
-const OrgCard = ({ width, height, organization }) => {
+const OrgCard = ({ width, organization }) => {
   //lets say organization is currently an object with a title, header pic, icon, link, organizer, contact info, desciption, and loc coords
   // const router = useRouter();
   const {id, title, profile_picture, name, headerImage, icon, description} = organization
   const navigation = useNavigation();
-  const cardWidth = width < height ? width*0.46 : width*0.28; 
-  const cardMargin = width < height ? width*0.02 : width*0.01 
+  const cardWidth = width*0.46 
+  const cardMargin = width*0.02 
   return (
-    <TouchableOpacity style={{...styles.card, width: cardWidth, margin: cardMargin}} onPress={() => navigation.navigate('OrgDetails', { id, title })}>
+    <TouchableOpacity style={{...styles.card, padding: cardWidth*0.05, paddingTop: 0,}} onPress={() => navigation.navigate('OrgDetails', { id, title })}> 
+        <Placeholder width={cardWidth* 0.9} styles={{margin: 0}}/>
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{title}</Text>
         <TouchableOpacity style={{position: 'absolute', right: 0, zIndex: 2}}>
@@ -30,19 +34,6 @@ const OrgCard = ({ width, height, organization }) => {
       <View style={styles.cardContent}>
         <Text>tags</Text>
       </View>
-      
-      {/* header image */}
-      <Image
-        source={{uri: organization.headerImage}}
-        resizeMode='cover'
-        style={styles.btnImg}
-      />
-      {/* icon image */}
-      <Image
-        source={{uri: organization.icon}}
-        resizeMode='cover'
-        style={styles.btnImg}
-      />
 
     </TouchableOpacity>
   )
@@ -54,7 +45,11 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   card: {
-    backgroundColor: 'white',
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    backgroundColor: COLORS.lightWhite,
     borderRadius: 10,
     elevation: 3, // for Android shadow
     shadowColor: '#000', // iOS shadow
@@ -62,8 +57,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     margin: '2%',
-    padding: '2.5%', 
-    height: 100
+    padding: '2.5%',
   },
   cardContent: {
     flexDirection: 'row',
@@ -72,6 +66,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 12,
     fontWeight: 'semibold',
+    flex: 1
   },
   cardDescription: {
     fontSize: 10,

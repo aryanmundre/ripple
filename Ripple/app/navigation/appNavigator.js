@@ -8,7 +8,7 @@ import OrgDetails from '../explore/orgDetails'
 import VisualizationScreen from '../visualizationScreen';
 import LeaderboardScreen from '../leaderboardScreen';
 import ProfileScreen from '../profileScreen';
-import OrganizationDetails from '../organizationDetails';
+// import OrganizationDetails from '../organizationDetails';
 import LogInSignUp from '../signin';
 import SignupScreen from '../signup';
 import LoginScreen from '../login';

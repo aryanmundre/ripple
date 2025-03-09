@@ -17,7 +17,6 @@ import Waves from '../../assets/background/explore_wave.svg';
 
 const ExploreCards = () => {
   const [actions, setActions] = useState([]);
-  const [fontsLoaded, setFontsLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [orgs, setOrgs] = useState({});
   const [searchMode, setSearchMode] = useState(false)
@@ -33,13 +32,11 @@ const ExploreCards = () => {
     });
     setFontsLoaded(true);
   };
-
-
   
   useEffect(() => {
-    // Simulate fetching data from backend or API
+    // Simulate fetching data from backend or API    
+    loadFonts();    
     setTimeout(() => {
-      loadFonts();
       setOrgs([
           {
             id: 1,
@@ -71,14 +68,26 @@ const ExploreCards = () => {
         },
           // Add more organizations as needed
       ]);
-
-
       setLoading(false);
     }, 2000); // Simulating a delay for fetching
 
     // Orientation.lockToPortrait(); //react native screen lock not compatible with expo-go
     ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
-  }, [fontsLoaded]);
+  }, []);
+
+  const renderOrgCards = () => {
+    const orgList = [];
+    for (let i = 0; i < orgs.length; i += 2) {
+      const row = (
+        <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between',  flexWrap: 'wrap'}}>
+          <OrgCard width={width} organization={orgs[i]} />
+          <OrgCard width={width} organization={orgs[i + 1]} />
+        </View>
+      );
+      orgList.push(row);
+    }
+    return orgList;
+  };
 
   return(
     <SafeAreaView style={{flex: 1, backgroundColor: COLORS.bg_color}}>
@@ -86,7 +95,6 @@ const ExploreCards = () => {
       <View style={{position:'absolute', flex: 1, bottom: 0, zIndex:-1}}>
         <Waves width={width} height={height*0.4}style={{zIndex: 0}}/>
       </View>
-
       {/* search mode */}
       { searchMode ? 
         (<>
@@ -109,7 +117,7 @@ const ExploreCards = () => {
         </>)
 
         :
-        (<>
+        (<ScrollView contentContainerStyle={{}}>
           <View style={{alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', marginLeft: 10, marginTop: 5, marginRight: 20, zIndex: 1}}>
             <TouchableOpacity>
               <Container width={40} height={40}/>
@@ -123,20 +131,10 @@ const ExploreCards = () => {
           </View>
 
         {/* main content */}
-          <View width={width} style = {{flex: 1, zIndex: 1}}>
-            { loading ? (<ActivityIndicator size = "large" color = {COLORS.primary} />) : 
-              (<FlatList
-                  data={orgs}
-                  renderItem={({ item }) => (
-                    <OrgCard key={item.id} width={width} height={height} organization={item} />
-                  )} 
-                  keyExtractor={(item) => item.id}
-                  numColumns={2} // Automatically creates 2 cards per row
-                  columnWrapperStyle={{ justifyContent: 'space-between', width: width}}
-                  contentContainerStyle={{ paddingHorizontal: 0, alignItems: 'center'}}
-              />)}
-          </View>
-        </>)}
+          { loading ? (<ActivityIndicator size="large" color={COLORS.primary}/>) : renderOrgCards()
+          }
+        </ScrollView>
+      )}
     </SafeAreaView>
   )
 }
