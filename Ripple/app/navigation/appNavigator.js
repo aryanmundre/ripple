@@ -11,10 +11,14 @@ import OrganizationDetails from '../organizationDetails';
 import LogInSignUp from '../signin';
 import SignupScreen from '../signup';
 import LoginScreen from '../login';
+import AccountSetup from '../AccountSetup';
+import LocationSetup from '../LocationSetup';
+import CauseSelection from '../CauseSelection';
 
 const Tab = createBottomTabNavigator();
 const ExploreStack = createStackNavigator();
 const AuthStack = createStackNavigator();
+const RootStack = createStackNavigator();
 
 const ExploreNavigator = () => (
     <ExploreStack.Navigator screenOptions={{ headerShown: false }}>
@@ -40,19 +44,71 @@ const TabNavigator = () => (
     </Tab.Navigator>
 );
 
-const AuthNavigator = () => (
-    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-        <AuthStack.Screen name="Signin" component={LogInSignUp} />
-        <AuthStack.Screen name="Signup" component={SignupScreen} />
-        <AuthStack.Screen name="Login" component={LoginScreen} />
-        
-        <AuthStack.Screen name="AppNavigator" component={TabNavigator} />
-    </AuthStack.Navigator>
-);
+const AuthNavigator = () => {
+    console.log('Setting up AuthNavigator');
+    return (
+        <AuthStack.Navigator 
+            screenOptions={{ 
+                headerShown: false,
+                gestureEnabled: true,
+            }}
+        >
+            <AuthStack.Screen 
+                name="Signin" 
+                component={LogInSignUp}
+                options={{ gestureEnabled: false }}
+            />
+            <AuthStack.Screen 
+                name="Signup" 
+                component={SignupScreen}
+                options={{ gestureEnabled: true }}
+            />
+            <AuthStack.Screen 
+                name="Login" 
+                component={LoginScreen}
+                options={{ gestureEnabled: true }}
+            />
+            <AuthStack.Screen 
+                name="AccountSetup" 
+                component={AccountSetup}
+                options={{
+                    gestureEnabled: true,
+                    animationEnabled: true,
+                }}
+            />
+            <AuthStack.Screen 
+                name="LocationSetup" 
+                component={LocationSetup}
+                options={{
+                    gestureEnabled: true,
+                    animationEnabled: true,
+                }}
+            />
+            <AuthStack.Screen 
+                name="CauseSelection" 
+                component={CauseSelection}
+                options={{
+                    gestureEnabled: true,
+                    animationEnabled: true,
+                }}
+            />
+            <AuthStack.Screen 
+                name="Main" 
+                component={TabNavigator}
+                options={{
+                    gestureEnabled: false,
+                }}
+            />
+        </AuthStack.Navigator>
+    );
+};
 
 const AppNavigator = () => (
     <NavigationContainer>
-        <AuthNavigator />
+        <RootStack.Navigator screenOptions={{ headerShown: false }}>
+            <RootStack.Screen name="Auth" component={AuthNavigator} />
+            <RootStack.Screen name="Main" component={TabNavigator} />
+        </RootStack.Navigator>
     </NavigationContainer>
 );
 

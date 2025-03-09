@@ -9,147 +9,184 @@ import {
     StyleSheet,
     Dimensions,
     Alert,
+    Pressable,
+    TouchableWithoutFeedback,
+    Keyboard,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { useNavigation } from "@react-navigation/native";
-import {useFonts, Judson_700Bold, } from "@expo-google-fonts/judson";
-import {MuseoModerno_400Regular, } from "@expo-google-fonts/museomoderno";
-import { Lato_500Medium, } from "@expo-google-fonts/lato";
-import { WorkSans_400Regular, } from "@expo-google-fonts/work-sans";
+import { useFonts } from 'expo-font';
+import { MuseoModerno_400Regular } from "@expo-google-fonts/museomoderno";
+import { WorkSans_400Regular } from "@expo-google-fonts/work-sans";
 import SvgWave from "../assets/icons/Wave.svg";  
+import { API_ENDPOINTS, handleApiError } from "../constants/api";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get("window");
 
 const socialLoginOptions = [
-    { name: "Google", icon: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/e88fc034-c7c3-4ebb-b63a-3021c95dc604" },
-    { name: "Apple", icon: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/cb655e3f-3bcf-47a7-aeed-cb79608ab556" },
-    { name: "Facebook", icon: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/d3d0830a-d38b-442a-b404-fb60637ed1b4" },
+    { name: "Google", icon: { uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/e88fc034-c7c3-4ebb-b63a-3021c95dc604" } },
+    { name: "Apple", icon: { uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/cb655e3f-3bcf-47a7-aeed-cb79608ab556" } },
+    { name: "Facebook", icon: { uri: "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/d3d0830a-d38b-442a-b404-fb60637ed1b4" } },
 ];
 
 export default function LogInSignUp() {
     const navigation = useNavigation();
-
-    const [fontsLoaded] = useFonts({
-        Judson_700Bold,
-        MuseoModerno_400Regular,
-        Lato_500Medium,
-        WorkSans_400Regular,
-    });
-
-
-    
-
-    const [showPassword, setShowPassword] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    // Function to handle login with API
+    const [fontsLoaded] = useFonts({
+        'MuseoModerno': MuseoModerno_400Regular,
+        'WorkSans': WorkSans_400Regular,
+    });
+
     const handleLogin = async () => {
         if (!username || !password) {
             Alert.alert("Error", "Please enter both username and password.");
             return;
         }
 
+        setIsLoading(true);
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/auth/login/", {
+            console.log('Attempting login with:', { email: username });
+            const response = await fetch(API_ENDPOINTS.LOGIN, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Accept": "application/json"
                 },
                 body: JSON.stringify({ email: username, password }),
             });
 
+            console.log('Response status:', response.status);
             const data = await response.json();
+            console.log('Server Response:', JSON.stringify(data, null, 2));
 
             if (response.ok) {
-                Alert.alert("Success", "Login Successful!");
-                navigation.navigate("ExploreScreen"); 
+                // Store the token
+                if (data.token) {
+                    await AsyncStorage.setItem('userToken', data.token);
+                    await AsyncStorage.setItem('userData', JSON.stringify(data.user));
+                }
+                navigation.navigate("Main");
             } else {
-                Alert.alert("Error", data.detail || "Login failed.");
+                const errorMessage = data.detail || 
+                    (typeof data === 'object' ? JSON.stringify(data) : 'Login failed. Please check your credentials.');
+                Alert.alert("Error", errorMessage);
             }
         } catch (error) {
-            Alert.alert("Error", "Something went wrong. Please try again.");
-            console.error("Login Error:", error);
+            console.log('Login Error:', error);
+            const errorMessage = handleApiError(error);
+            Alert.alert("Error", errorMessage);
+        } finally {
+            setIsLoading(false);
         }
     };
 
+    if (!fontsLoaded) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.content}>
+                    <Text style={[styles.title, { fontFamily: undefined }]}>Welcome Back</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
     return (
-        <SafeAreaView style={styles.container}>
-            {/* Back Button - Navigates to Signup Page */}
-        <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}  // ✅ This makes it go back dynamically
-        >
-            <Icon name="arrow-left" size={24} color="black" />  
-        </TouchableOpacity>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <SafeAreaView style={styles.container}>
+                {/* White Background for top section */}
+                <View style={styles.topBackground} />
 
-            <View style={styles.topBackground} />
-
-            <View style={styles.waveContainer}>
-            <SvgWave width={width} height={height * 0.70} />
-            </View>
-
-            <View style={styles.welcomeContainer}>
-                <Text style={styles.welcomeText}>Welcome Back</Text>
-                <Text style={styles.subtitle}>Log in to start your Ripple</Text>
-
-                {/* Username Input */}
-                <View style={styles.inputContainer}>
-                    <Icon name="user" size={20} color="#565353" />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Username"
-                        placeholderTextColor="#A9A9A9"
-                        value={username}
-                        onChangeText={setUsername}
-                    />
-                </View>
-
-                {/* Password Input */}
-                <View style={styles.inputContainer}>
-                    <Icon name="lock" size={20} color="#565353" />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Password"
-                        placeholderTextColor="#A9A9A9"
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry={!showPassword}
-                    />
-                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                        <Icon name={showPassword ? "eye-off" : "eye"} size={20} color="#565353" />
-                    </TouchableOpacity>
-                </View>
-
-                {/* Log In Button - Connects to API */}
-                <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-                    <Text style={styles.buttonText}>Log In</Text>
+                {/* Back Button */}
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => navigation.goBack()}
+                >
+                    <Icon name="arrow-left" size={24} color="black" />
                 </TouchableOpacity>
-            </View>
 
-            {/* Social Media Login */}
-            <View style={styles.socialContainer}>
-                <Text style={styles.socialText}>Or continue with</Text>
-                <View style={styles.socialIcons}>
-                    {socialLoginOptions.map((option) => (
-                        <TouchableOpacity key={option.name} style={styles.socialIconContainer}>
-                            <Image source={{ uri: option.icon }} style={styles.socialIcon} />
-                        </TouchableOpacity>
-                    ))}
+                {/* Wave Container */}
+                <View style={styles.waveContainer}>
+                    <SvgWave width={width} height={height * 0.55} />
                 </View>
-                <View style={{ marginTop: 20 }}>
-                    <Text style={styles.socialText}>
-                        Don't have an account?{" "}
-                        <Text
-                            style={styles.signUpText}
-                            onPress={() => navigation.navigate("Signup")}
+
+                <View style={styles.content}>
+                    <Text style={styles.title}>Welcome Back</Text>
+                    <Text style={styles.subtitle}>Log in to start your Ripple</Text>
+
+                    <View style={styles.inputContainer}>
+                        <View style={styles.inputWrapper}>
+                            <Icon name="user" size={20} color="#666666" style={styles.inputIcon} />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Username"
+                                placeholderTextColor="#666666"
+                                value={username}
+                                onChangeText={setUsername}
+                            />
+                        </View>
+
+                        <View style={styles.inputWrapper}>
+                            <Icon name="lock" size={20} color="#666666" style={styles.inputIcon} />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Password"
+                                placeholderTextColor="#666666"
+                                secureTextEntry={!showPassword}
+                                value={password}
+                                onChangeText={setPassword}
+                            />
+                            <TouchableOpacity 
+                                onPress={() => setShowPassword(!showPassword)}
+                                style={styles.eyeIcon}
+                            >
+                                <Icon 
+                                    name={showPassword ? "eye" : "eye-off"} 
+                                    size={20} 
+                                    color="#666666" 
+                                />
+                            </TouchableOpacity>
+                        </View>
+
+                        <TouchableOpacity 
+                            style={styles.forgotPassword}
+                            onPress={() => {/* Handle forgot password */}}
                         >
-                            Sign up
-                        </Text>
-                    </Text>
+                            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.loginButton}
+                            onPress={handleLogin}
+                        >
+                            <Text style={styles.loginButtonText}>Log In</Text>
+                        </TouchableOpacity>
+
+                        <View style={styles.socialContainer}>
+                            <Text style={styles.socialText}>Or continue with</Text>
+                            <View style={styles.socialButtons}>
+                                {socialLoginOptions.map((option) => (
+                                    <TouchableOpacity key={option.name} style={styles.socialButton}>
+                                        <Image source={option.icon} style={styles.socialIcon} />
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </View>
+
+                        <View style={styles.signupContainer}>
+                            <Text style={styles.signupText}>Don't have an account? </Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+                                <Text style={styles.signupLink}>Sign up</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
                 </View>
-            </View>
-        </SafeAreaView>
+            </SafeAreaView>
+        </TouchableWithoutFeedback>
     );
 }
 
@@ -157,115 +194,138 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#0D408A",
-        alignItems: "center",
-        justifyContent: "center",
-        paddingHorizontal: '5%',
-    },
-    backButton: {
-        position: "absolute",
-        top: '10%',
-        left: '5%',
-        zIndex: 10,
-    },
-    welcomeContainer: {
-        position: "absolute",
-        top: '35%',
-        alignItems: 'center',
-        width: '80%',
     },
     topBackground: {
         position: "absolute",
         width: "100%",
-        height: "30%", // ✅ Covers the top portion in white
+        height: "35%",
         backgroundColor: "white",
         top: 0,
         left: 0,
         right: 0,
     },
+    backButton: {
+        position: "absolute",
+        top: 50,
+        left: 20,
+        zIndex: 10,
+    },
     waveContainer: {
         position: "absolute",
-        top: "-7%", // ✅ Raised wave higher
+        top: "0%",
         left: 0,
         right: 0,
+        zIndex: 1,
     },
-    welcomeText: {
-        fontSize: 36,
-        fontFamily: "MuseoModerno_400Regular",
-        color: "white",
-        lineHeight: 45, // ⬆️ Slightly increased for better spacing
-        top: "5%"
+    content: {
+        flex: 1,
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingTop: 200,
+        zIndex: 2,
     },
-    
+    title: {
+        color: 'white',
+        fontSize: 32,
+        fontFamily: 'MuseoModerno',
+        marginBottom: 8,
+    },
     subtitle: {
+        color: 'white',
         fontSize: 16,
-        fontFamily: "Lato_500Medium",
-        fontWeight: "500",
-        color: "white",
-        textAlign: "center",
-        marginVertical: 20,
+        fontFamily: 'WorkSans',
+        marginBottom: 40,
     },
     inputContainer: {
+        width: '100%',
+        alignItems: 'center',
+    },
+    inputWrapper: {
+        width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         borderRadius: 30,
-        width: '100%',
-        padding: 10,
-        marginVertical: 10,
+        marginBottom: 16,
+        paddingHorizontal: 20,
+        height: 50,
+    },
+    inputIcon: {
+        marginRight: 10,
     },
     input: {
         flex: 1,
-        marginLeft: 10,
-        fontSize: 20,
-        color: "#565353",
-        fontFamily: "WorkSans-Regular",
+        height: '100%',
+        fontFamily: 'WorkSans',
+        fontSize: 16,
+        color: '#333333',
+    },
+    eyeIcon: {
+        padding: 5,
+    },
+    forgotPassword: {
+        alignSelf: 'flex-end',
+        marginBottom: 24,
+    },
+    forgotPasswordText: {
+        color: 'white',
+        fontFamily: 'WorkSans',
+        fontSize: 14,
     },
     loginButton: {
-        alignItems: "center",
-        backgroundColor: "#B8E1EB",
-        borderRadius: 30,
-        paddingVertical: 18,
-        marginVertical: 80,
         width: '100%',
+        backgroundColor: '#B8E1EB',
+        borderRadius: 30,
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 40,
     },
-    buttonText: {
-        fontSize: 20,
-        color: "black",
-        fontFamily: "Lato_500Medium",
+    loginButtonText: {
+        color: '#333333',
+        fontSize: 16,
+        fontFamily: 'WorkSans',
     },
     socialContainer: {
-        position: "absolute",
-        top: '88%',
-        alignItems: "center",
-        width: '80%',
+        alignItems: 'center',
+        marginBottom: 30,
     },
     socialText: {
-        fontSize: 16,
-        fontFamily: "Lato_500Medium",
-        fontWeight: "500",
-        color: "white",
-        marginBottom: 12,
+        color: 'white',
+        fontFamily: 'WorkSans',
+        fontSize: 14,
+        marginBottom: 20,
     },
-    socialIcons: {
-        flexDirection: "row",
-        justifyContent: 'space-evenly',
-        width: '80%',
+    socialButtons: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 20,
     },
-    socialIconContainer: {
+    socialButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
         backgroundColor: 'white',
-        borderRadius: 27,
-        width: 27,
-        height: 27,
         justifyContent: 'center',
         alignItems: 'center',
     },
     socialIcon: {
-        width: 27,
-        height: 27,
+        width: 24,
+        height: 24,
     },
-    signUpText: {
-        fontFamily: "Lato_500Medium",
-        color: "white",
-        fontWeight: "700",
+    signupContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    signupText: {
+        color: 'white',
+        fontFamily: 'WorkSans',
+        fontSize: 14,
+    },
+    signupLink: {
+        color: 'white',
+        fontFamily: 'WorkSans',
+        fontSize: 14,
+        
     },
 });

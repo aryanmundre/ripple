@@ -3,6 +3,7 @@ import { View, SafeAreaView, ActivityIndicator, Text, FlatList, Image, Touchable
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { COLORS, SIZES } from "../constants";
+import { API_ENDPOINTS } from "../constants/api";
 
 const ExploreScreen = () => {
     const navigation = useNavigation();
@@ -22,7 +23,7 @@ const ExploreScreen = () => {
 
     const fetchActions = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/actions/trending/');
+            const response = await fetch(API_ENDPOINTS.TRENDING_ACTIONS);
             if (!response.ok) {
                 throw new Error('Failed to fetch actions');
             }
@@ -30,34 +31,7 @@ const ExploreScreen = () => {
             setActions(data);
         } catch (err) {
             console.error("Error fetching data:", err.message);
-
-            // ✅ Fallback data if API request fails
-            setActions([
-                {
-                    id: 1,
-                    name: 'Tree Planting Drive',
-                    organization: 'Eco Warriors',
-                    category: 'Environmental',
-                    action_type: 'Community Service',
-                    thumbnail: 'https://example.com/tree-planting.jpg',
-                },
-                {
-                    id: 2,
-                    name: 'Blood Donation Camp',
-                    organization: 'Red Cross',
-                    category: 'Medical Assistance',
-                    action_type: 'Donation',
-                    thumbnail: 'https://example.com/blood-donation.jpg',
-                },
-                {
-                    id: 3,
-                    name: 'Food Distribution Drive',
-                    organization: 'Food for All',
-                    category: 'Food Security',
-                    action_type: 'Community Aid',
-                    thumbnail: 'https://example.com/food-distribution.jpg',
-                },
-            ]);
+            setError("Failed to load actions. Please try again later.");
         } finally {
             setLoading(false);
         }

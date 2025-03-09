@@ -4,49 +4,50 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import SvgBackArrow from '../assets/icons/BackArrow.svg'; 
 import { COLORS } from '../constants';
+import { API_ENDPOINTS } from "../constants/api";
 
 const OrganizationScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const { organizationId } = route.params; // Get the ID from navigation params
+    const { organizationId } = route.params;
     const [organization, setOrganization] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         fetchOrganizationDetails();
     }, []);
 
     const fetchOrganizationDetails = async () => {
-        const baseURL = 'http://127.0.0.1:8000/api'; // Change to local IP if using a physical device
-        const apiURL = `${baseURL}/organizations/${organizationId}/`;
-
         try {
-            const response = await fetch(apiURL);
-            if (!response.ok) throw new Error('Failed to fetch data');
+            const response = await fetch(`${API_ENDPOINTS.ORGANIZATIONS}${organizationId}/`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch organization details');
+            }
             const data = await response.json();
             setOrganization(data);
         } catch (error) {
             console.error("Error fetching data:", error.message);
-            
-            // ✅ Explicitly setting fallback data
-            setOrganization({
-                id: 1,
-                name: 'Blood Donation',
-                xp: 50,
-                orgName: 'American Red Cross',
-                orgLogo: 'https://example.com/red-cross-logo.png',
-                thumbnail: 'https://example.com/blood-donation.jpg',
-                description: 'Join us for a blood donation drive and save lives!',
-                organizer: 'Aryan Mundre',
-                location: 'Los Angeles, CA',
-            });
+            setError("Failed to load organization details. Please try again later.");
         } finally {
             setLoading(false);
         }
     };
 
     if (loading) {
-        return <ActivityIndicator size="large" color={COLORS.primary} style={styles.loader} />;
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={COLORS.primary} />
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{error}</Text>
+            </View>
+        );
     }
 
     return (
@@ -204,6 +205,21 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#666',
         marginTop: 5,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 

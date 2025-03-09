@@ -1,4 +1,3 @@
-//Third page
 import React, { useState } from 'react';
 import { 
     SafeAreaView, 
@@ -10,24 +9,31 @@ import {
     Pressable,
     TouchableWithoutFeedback,
     Keyboard,
+    TouchableOpacity,
+    Platform,
+    Modal,
     Alert,
 } from 'react-native';
+import CalendarPicker from 'react-native-calendar-picker';
 import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
 import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ProgressBar from "../assets/icons/progressBar.svg";  
+import ProgressBar from "../assets/icons/progressBar2.svg";  
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";  
+import Icon from "react-native-vector-icons/Feather";
 
 const { width, height } = Dimensions.get('window');
 
-const SignupScreen = () => {
+const AccountSetup = () => {
     const navigation = useNavigation();
     
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [preferredName, setPreferredName] = useState('');
+    const [username, setUsername] = useState('');
+    const [dateOfBirth, setDateOfBirth] = useState('');
+    const [showCalendar, setShowCalendar] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     let [fontsLoaded] = useFonts({
@@ -36,23 +42,57 @@ const SignupScreen = () => {
     });
 
     const handleNext = async () => {
-        if (!firstName || !lastName) {
-            Alert.alert('Error', 'Please enter your first and last name');
+        if (!username || !dateOfBirth || !email || !password) {
+            Alert.alert('Error', 'Please fill in all fields');
+            return;
+        }
+
+        if (!email.includes('@')) {
+            Alert.alert('Error', 'Please enter a valid email address');
+            return;
+        }
+
+        if (password.length < 8) {
+            Alert.alert('Error', 'Password must be at least 8 characters long');
             return;
         }
 
         try {
-            // Store signup data for later use
-            const signupData = {
-                firstName,
-                lastName,
-                preferredName: preferredName || firstName,
+            const existingData = await AsyncStorage.getItem('signupData');
+            const signupData = JSON.parse(existingData || '{}');
+            
+            // Add account setup data
+            const updatedData = {
+                ...signupData,
+                username,
+                dateOfBirth,
+                email,
+                password,
             };
-            await AsyncStorage.setItem('signupData', JSON.stringify(signupData));
-            navigation.navigate('AccountSetup');
+            
+            await AsyncStorage.setItem('signupData', JSON.stringify(updatedData));
+            navigation.navigate('LocationSetup');
         } catch (error) {
-            Alert.alert('Error', 'Could not save signup data');
+            Alert.alert('Error', 'Could not save account data');
         }
+    };
+
+    const onDateChange = (date) => {
+        if (date) {
+            const selectedDate = new Date(date);
+            const formattedDate = selectedDate.toLocaleDateString('en-US', {
+                month: '2-digit',
+                day: '2-digit',
+                year: 'numeric'
+            });
+            setDateOfBirth(formattedDate);
+        }
+        setShowCalendar(false);
+    };
+
+    const toggleCalendar = () => {
+        setShowCalendar(!showCalendar);
+        Keyboard.dismiss();
     };
 
     return (
@@ -66,36 +106,72 @@ const SignupScreen = () => {
                         <ProgressBar width={274} height={10} />
                     </View>
 
-                    <Text style={styles.subtitle}>Tell us your name</Text>
+                    <Text style={styles.subtitle}>Set up your account</Text>
 
                     <View style={styles.inputContainer}>
                         <View style={styles.inputWrapper}>
                             <TextInput
                                 style={styles.input}
-                                placeholder="First Name"
+                                placeholder="Username"
                                 placeholderTextColor="#A9A9A9"
-                                value={firstName}
-                                onChangeText={setFirstName}
+                                value={username}
+                                onChangeText={setUsername}
                             />
                         </View>
-                        
+
+                        <View style={styles.datePickerContainer}>
+                            <TouchableOpacity 
+                                style={styles.inputWrapper}
+                                onPress={toggleCalendar}
+                            >
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Date of birth"
+                                    placeholderTextColor="#A9A9A9"
+                                    value={dateOfBirth}
+                                    editable={false}
+                                />
+                                <Icon name="calendar" size={20} color="#A9A9A9" style={styles.calendarIcon} />
+                            </TouchableOpacity>
+
+                            {showCalendar && (
+                                <View style={styles.calendarContainer}>
+                                    <CalendarPicker
+                                        onDateChange={onDateChange}
+                                        maxDate={new Date()}
+                                        minDate={new Date(1900, 0, 1)}
+                                        selectedDayColor="#5AA8DC"
+                                        selectedDayTextColor="#FFFFFF"
+                                        width={width * 0.85}
+                                        textStyle={{
+                                            fontFamily: 'WorkSans_400Regular',
+                                            color: '#333333',
+                                        }}
+                                    />
+                                </View>
+                            )}
+                        </View>
+
                         <View style={styles.inputWrapper}>
                             <TextInput
                                 style={styles.input}
-                                placeholder="Last Name"
+                                placeholder="Email Address"
                                 placeholderTextColor="#A9A9A9"
-                                value={lastName}
-                                onChangeText={setLastName}
+                                value={email}
+                                onChangeText={setEmail}
+                                keyboardType="email-address"
+                                autoCapitalize="none"
                             />
                         </View>
 
                         <View style={styles.inputWrapper}>
                             <TextInput
                                 style={styles.input}
-                                placeholder="Preferred Name"
+                                placeholder="Password"
                                 placeholderTextColor="#A9A9A9"
-                                value={preferredName}
-                                onChangeText={setPreferredName}
+                                value={password}
+                                onChangeText={setPassword}
+                                secureTextEntry
                             />
                         </View>
                     </View>
@@ -174,6 +250,11 @@ const styles = StyleSheet.create({
         fontFamily: 'WorkSans_400Regular',
         fontSize: 16,
     },
+    calendarIcon: {
+        position: 'absolute',
+        right: 20,
+        top: 15,
+    },
     nextButton: {
         backgroundColor: '#5AA8DC',
         paddingVertical: 12,
@@ -208,6 +289,29 @@ const styles = StyleSheet.create({
         zIndex: 0,
         pointerEvents: 'none',
     },
+    datePickerContainer: {
+        width: '100%',
+        position: 'relative',
+        zIndex: 1000,
+    },
+    calendarContainer: {
+        position: 'absolute',
+        top: '100%',
+        left: 0,
+        right: 0,
+        backgroundColor: 'white',
+        borderRadius: 15,
+        padding: 10,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        zIndex: 1000,
+    },
 });
 
-export default SignupScreen;
+export default AccountSetup; 
