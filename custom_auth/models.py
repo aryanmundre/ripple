@@ -14,6 +14,14 @@ class CustomUser(AbstractUser):
     streak_days = models.PositiveIntegerField(default=0)  # Consecutive days of activity
     bio = models.TextField(null=True, blank=True)  # Short bio for the user's profile
     profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)  # User's avatar
+    
+    # User information
+    date_of_birth = models.DateField(null=True, blank=True)  # User's date of birth
+    street_address = models.CharField(max_length=255, null=True, blank=True)  # User's address
+    city = models.CharField(max_length=100, null=True, blank=True)  # User's city
+    state = models.CharField(max_length=100, null=True, blank=True)  # User's state
+    zip_code = models.CharField(max_length=10, null=True, blank=True)  # User's ZIP code
+
 
     # Cause preferences
     interests = models.JSONField(default=dict)  # Store user-selected causes (e.g., {"environment": True, "education": False})
@@ -23,6 +31,5 @@ class CustomUser(AbstractUser):
     badges_earned = models.JSONField(default=list)  # List of badge IDs the user has earned
     ripple_size = models.PositiveIntegerField(default=0)  # Impact size (e.g., how many users they’ve influenced)
     
-    city = models.CharField(max_length=100, null=True, blank=True)  # User's city
     def __str__(self):
         return self.username  # Display username as object name in admin

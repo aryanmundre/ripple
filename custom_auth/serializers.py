@@ -102,5 +102,5 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = [
             "email", "display_name", "is_verified", "points", "streak_days", "bio", 
-            "profile_picture", "interests", "preferred_time_commitment", "badges_earned", "ripple_size", "city"
+            "profile_picture", "interests", "preferred_time_commitment", "badges_earned", "ripple_size", "city", "date_of_birth", "state", "street_address", "zip_code"
         ]

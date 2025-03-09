@@ -6,8 +6,11 @@ from firebase_admin import auth
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from custom_auth.models import CustomUser
+from custom_auth.serializers import UserProfileSerializer
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 
 class RegisterView(APIView):
     @swagger_auto_schema(
@@ -159,3 +162,253 @@ class LogoutView(APIView):
             return Response({"message": "User logged out successfully"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+# Get user profile
+class UserProfileView(APIView):
+    @swagger_auto_schema(
+        operation_summary="Get user profile",
+        manual_parameters=[
+            openapi.Parameter(
+                name='uid',
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                description='Firebase UID of the user',
+                required=True
+            )
+        ],
+        responses={
+            200: UserProfileSerializer,
+            404: "User not found"
+        }
+    )
+    def get(self, request):
+        uid = request.query_params.get('uid')
+        
+        if not uid:
+            return Response({"error": "User ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            user = get_object_or_404(CustomUser, firebase_uid=uid)
+            serializer = UserProfileSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+    
+    @swagger_auto_schema(
+        operation_summary="Update user profile",
+        request_body=UserProfileSerializer,
+        manual_parameters=[
+            openapi.Parameter(
+                name='uid',
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                description='Firebase UID of the user',
+                required=True
+            )
+        ],
+        responses={
+            200: UserProfileSerializer,
+            400: "Invalid request body",
+            404: "User not found"
+        }
+    )
+    def patch(self, request):
+        uid = request.query_params.get('uid')
+        
+        if not uid:
+            return Response({"error": "User ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            user = get_object_or_404(CustomUser, firebase_uid=uid)
+            serializer = UserProfileSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+
+# Upload profile picture
+class ProfilePictureUploadView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    
+    @swagger_auto_schema(
+        operation_summary="Upload profile picture",
+        manual_parameters=[
+            openapi.Parameter(
+                name='uid',
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                description='Firebase UID of the user',
+                required=True
+            ),
+            openapi.Parameter(
+                name='profile_picture',
+                in_=openapi.IN_FORM,
+                type=openapi.TYPE_FILE,
+                required=True,
+                description='Profile picture file'
+            )
+        ],
+        responses={
+            200: "Profile picture uploaded successfully",
+            400: "Invalid request body",
+            404: "User not found"
+        }
+    )
+    def post(self, request):
+        uid = request.query_params.get('uid')
+        
+        if not uid or 'profile_picture' not in request.FILES:
+            return Response({"error": "User ID and profile picture are required"}, 
+                            status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            user = get_object_or_404(CustomUser, firebase_uid=uid)
+            user.profile_picture = request.FILES['profile_picture']
+            user.save()
+            return Response({"message": "Profile picture uploaded successfully"}, 
+                           status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+
+# Update user interests
+class UserInterestsView(APIView):
+    @swagger_auto_schema(
+        operation_summary="Update user interests",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'interests': openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    description='User interests as key-value pairs',
+                    example={'environment': True, 'education': False, 'healthcare': True}
+                )
+            },
+            required=['interests']
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                name='uid',
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                description='Firebase UID of the user',
+                required=True
+            )
+        ],
+        responses={
+            200: "Interests updated successfully",
+            400: "Invalid request body",
+            404: "User not found"
+        }
+    )
+    def post(self, request):
+        uid = request.query_params.get('uid')
+        interests = request.data.get('interests')
+        
+        if not uid or not interests:
+            return Response({"error": "User ID and interests are required"}, 
+                            status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            user = get_object_or_404(CustomUser, firebase_uid=uid)
+            user.interests = interests
+            user.save()
+            return Response({"message": "Interests updated successfully", 
+                             "interests": user.interests}, 
+                            status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+
+
+# Email verification
+class EmailVerificationView(APIView):
+    @swagger_auto_schema(
+        operation_summary="Send email verification",
+        manual_parameters=[
+            openapi.Parameter(
+                name='uid',
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                description='Firebase UID of the user',
+                required=True
+            )
+        ],
+        responses={
+            200: "Verification email sent",
+            400: "Invalid request",
+            404: "User not found"
+        }
+    )
+    def post(self, request):
+        uid = request.query_params.get('uid')
+        
+        if not uid:
+            return Response({"error": "User ID is required"}, 
+                            status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            # Get Firebase user
+            firebase_user = auth.get_user(uid)
+            
+            # Generate verification link
+            # Note: You would typically use Firebase's email verification here
+            # This is a simplified example
+            link = auth.generate_email_verification_link(firebase_user.email)
+            
+            # In a real app, you would send this link via email
+            # Here we're just returning it in the response
+            
+            return Response({"message": "Verification email link generated", 
+                            "verification_link": link}, 
+                           status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+            
+    @swagger_auto_schema(
+        operation_summary="Confirm email verification",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'verification_code': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Verification code from the email'
+                )
+            },
+            required=['verification_code']
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                name='uid',
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+                description='Firebase UID of the user',
+                required=True
+            )
+        ],
+        responses={
+            200: "Email verified successfully",
+            400: "Invalid request body",
+            404: "User not found"
+        }
+    )
+    def patch(self, request):
+        uid = request.query_params.get('uid')
+        verification_code = request.data.get('verification_code')
+        
+        if not uid or not verification_code:
+            return Response({"error": "User ID and verification code are required"}, 
+                            status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            # In a real implementation, you would verify the code
+            # Here we're just setting the user as verified
+            
+            user = get_object_or_404(CustomUser, firebase_uid=uid)
+            user.is_verified = True
+            user.save()
+            
+            return Response({"message": "Email verified successfully"}, 
+                           status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
