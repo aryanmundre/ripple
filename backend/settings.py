@@ -108,6 +108,15 @@ DATABASES = {
 #    }=
     'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
 }
+"""    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ripple_db',
+        'USER': 'postgres',
+        'PASSWORD': 'password123',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+"""
 
 
 AUTH_USER_MODEL = 'custom_auth.CustomUser'
