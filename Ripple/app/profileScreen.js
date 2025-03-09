@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, Image, Dimensions, TouchableOpacity, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
-//import { useFonts } from 'expo-font';
 import { FontAwesome } from '@expo/vector-icons';
 import { COLORS } from '../constants';
 import Waves3 from '../assets/icons/Waves3.svg';
@@ -120,6 +119,7 @@ const styles = StyleSheet.create({
         paddingTop: 50,
         zIndex: 2, //Brings profile section in front of the wave
     },
+
     profileImage: {
         width: 80,
         height: 80,

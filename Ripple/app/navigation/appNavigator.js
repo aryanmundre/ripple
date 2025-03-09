@@ -16,6 +16,14 @@ import ProfileSettings from '../profileSettings.js';
 const Tab = createBottomTabNavigator();
 const ExploreStack = createStackNavigator();
 const AuthStack = createStackNavigator();
+const ProfileStack = createStackNavigator();
+
+const ProfileNavigator = () => (
+    <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
+        <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
+        <ProfileStack.Screen name="ProfileSettings" component={ProfileSettings} />
+    </ProfileStack.Navigator>
+);
 
 const ExploreNavigator = () => (
     <ExploreStack.Navigator screenOptions={{ headerShown: false }}>
@@ -37,7 +45,7 @@ const TabNavigator = () => (
         <Tab.Screen name="Explore" component={ExploreNavigator} />
         <Tab.Screen name="Visualization" component={VisualizationScreen} />
         <Tab.Screen name="Leaderboard" component={LeaderboardScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
+        <Tab.Screen name="Profile" component={ProfileNavigator} />
     </Tab.Navigator>
 );
 
