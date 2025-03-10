@@ -11,6 +11,7 @@ import OrganizationDetails from '../organizationDetails';
 import LogInSignUp from '../signin';
 import SignupScreen from '../signup';
 import LoginScreen from '../login';
+import SplashScreen from '../splash';
 
 const Tab = createBottomTabNavigator();
 const ExploreStack = createStackNavigator();
@@ -42,10 +43,10 @@ const TabNavigator = () => (
 
 const AuthNavigator = () => (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+        <AuthStack.Screen name="Splash" component={SplashScreen} />
         <AuthStack.Screen name="Signin" component={LogInSignUp} />
         <AuthStack.Screen name="Signup" component={SignupScreen} />
         <AuthStack.Screen name="Login" component={LoginScreen} />
-        
         <AuthStack.Screen name="AppNavigator" component={TabNavigator} />
     </AuthStack.Navigator>
 );
