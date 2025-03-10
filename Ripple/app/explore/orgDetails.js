@@ -2,238 +2,365 @@
 // import { View, Image, Text, ScrollView, SafeAreaView, Button, ActivityIndicator } from 'react-native';
 // import { useNavigation, useRoute } from '@react-navigation/native';
 
+
 // import { TestComponent, Login, ScreenHeaderBackBtn, OrgCard } from '../../components';
 // import { COLORS, icons, images, SIZES } from "../../constants";
 // import styles from '../../styles/test.js';
 
+
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, StatusBar } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
+import * as Font from 'expo-font';
 
-import SvgBackArrow from '../../assets/icons/BackArrow.svg'; 
+
+import BackArrow from '../../assets/icons/BackArrow.svg';
+import Star from '../../assets/icons/Star.svg';
+import LocationPin from '../../assets/icons/Location.svg';
 import { COLORS } from '../../constants/index.js';
 
-const OrgPage = () => {
-    const navigation = useNavigation();
-    const route = useRoute();
-    const {id, title} = route.params;
-    const { organizationId } = route.params; // Get the ID from navigation params
-    const [organization, setOrganization] = useState(null);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchOrganizationDetails();
-    }, []);
+const OrgDetails = () => {
+   const navigation = useNavigation();
+   const route = useRoute();
+   const { id, title } = route.params;
+   const [organization, setOrganization] = useState(null);
+   const [loading, setLoading] = useState(true);
+   const [fontsLoaded, setFontsLoaded] = useState(false);
+   const [isStarred, setIsStarred] = useState(false);
 
-    const fetchOrganizationDetails = async () => {
-        const baseURL = 'https://ripple-z6px.onrender.com/api/'; // Change to local IP if using a physical device
-        const apiURL = `${baseURL}actions/feed/?`;
-        const params = new URLSearchParams({
-          name: 'action-feed'
-        })
 
-        try {
-            const response = await fetch(`${apiURL}?${params.toString()}`, {
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            });
-            if (!response.ok) throw new Error('Failed to fetch data');
-            const data = await response.json();
-            console.log(data);
-            setOrganization(data);
-        } catch (error) {
-            console.error("Error fetching data:", error.message);
-            
-            // ✅ Explicitly setting fallback data
-            setOrganization({
-                id: 1,
-                name: 'Blood Donation',
-                xp: 50,
-                orgName: 'American Red Cross',
-                orgLogo: 'https://example.com/red-cross-logo.png',
-                thumbnail: 'https://example.com/blood-donation.jpg',
-                description: 'Join us for a blood donation drive and save lives!',
-                organizer: 'Aryan Mundre',
-                location: 'Los Angeles, CA',
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
+   const loadFonts = async () => {
+       await Font.loadAsync({
+           'WorkSans-Regular': require('../../assets/fonts/WorkSans-Regular.ttf'),
+       });
+       setFontsLoaded(true);
+   };
 
-    if (loading) {
-        return <ActivityIndicator size="large" color={COLORS.primary} style={styles.loader} />;
-    }
 
-  return (      
-    <SafeAreaView style={{flex: 1, backgroundColor: COLORS.lightWhite}}>
-      <ScrollView showsVerticalScrollIndicator={true}>
-        {/* Thumbnail Image with Back Button */}
-        <View>
-          <Image source={{ uri: organization.thumbnail }} style={{...styles.image, backgroundColor: 'pink'}} />
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <SvgBackArrow width={24} height={24} fill="black" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.container}>
-          {/* header with organization titles */}
-          <View style={styles.header}>
-            <Text style={styles.title}>
-              {organization.name} <Text style={styles.xp}>{organization.xp}XP</Text>
-            </Text>
-            <TouchableOpacity>
-              <FontAwesome name="star-o" size={24} color="black" />
-            </TouchableOpacity>
-          </View>
+   useEffect(() => {
+       loadFonts();
+       fetchOrganizationDetails();
+   }, []);
 
-          <View style={styles.orgInfo}>
-            <Image source={{ uri: organization.orgLogo }} style={styles.orgLogo} />
-            <Text style={styles.orgName}>{organization.orgName}</Text>
-          </View>
 
-          <TouchableOpacity style={styles.registerButton}>
-            <Text style={styles.registerText}>Register</Text>
-          </TouchableOpacity>
+   const fetchOrganizationDetails = async () => {
+       try {
+           // Simulated data for development
+           setOrganization({
+               id: 1,
+               name: 'Blood Donation',
+               xp: 50,
+               orgName: 'American Red Cross',
+               orgLogo: 'https://placehold.co/80/ff0000/ffffff.png?text=RC',
+               thumbnail: 'https://placehold.co/1000x600/ff0000/ffffff.png?text=Blood+Donation',
+               description: 'Join us for a blood donation drive and save lives! Our experienced team will ensure a safe and comfortable donation process.',
+               organizer: 'Lisa Ripple',
+               location: 'Los Angeles, CA',
+               tags: ['Medical Assistance', 'Disability Support']
+           });
+       } catch (error) {
+           console.error("Error fetching data:", error.message);
+       } finally {
+           setLoading(false);
+       }
+   };
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>The Team</Text>
-            <View style={styles.organizerRow}>
-              <FontAwesome name="user-circle-o" size={24} color="#aaa" />
-              <View style={styles.organizerDetails}>
-                <Text style={styles.organizerName}>{organization.organizer}</Text>
-                  <Text style={styles.organizerFrom}>From: {organization.orgName}</Text>
-                </View>
-                <TouchableOpacity style={styles.contactButton}>
-                  <FontAwesome name="envelope-o" size={16} color={COLORS.primary} />
-                  <Text style={styles.contactText}>Contact Organizer</Text>
-                </TouchableOpacity>
-            </View>
-          </View>
+   const handleStarPress = () => {
+    setIsStarred(!isStarred);
+   };
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Description</Text>
-            <Text style={styles.description}>{organization.description}</Text>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+
+   if (loading || !fontsLoaded) {
+       return <ActivityIndicator size="large" color={COLORS.primary} style={styles.loader} />;
+   }
+
+
+   return (     
+       <SafeAreaView style={[styles.container, { backgroundColor: 'transparent' }]}>
+           <View style={styles.imageContainer}>
+               <Image
+                   source={{ uri: organization.thumbnail }}
+                   style={styles.headerImage}
+                   resizeMode="cover"
+               />
+               <View style={styles.locationContainer}>
+                   <LocationPin width={16} height={16} fill="#fff" />
+                   <Text style={styles.locationText}>{organization.location}</Text>
+               </View>
+               <TouchableOpacity
+                   style={styles.backButton}
+                   onPress={() => navigation.goBack()}
+               >
+                   <BackArrow width={24} height={24} fill="#000000" stroke="#000000" strokeWidth={1.5} />
+               </TouchableOpacity>
+           </View>
+
+
+           <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+               <View style={styles.content}>
+                   {/* Title Section */}
+                   <View style={styles.header}>
+                       <Text style={styles.title}>
+                           {organization.name} <Text style={styles.xp}>{organization.xp}XP</Text>
+                       </Text>
+                       <TouchableOpacity 
+                            onPress={handleStarPress}
+                            style={styles.starButton}
+                        >
+                            <FontAwesome 
+                                name={isStarred ? "star" : "star-o"} 
+                                size={28} 
+                                color={isStarred ? "#FFD700" : "#000000"}
+                            />
+                        </TouchableOpacity>
+                   </View>
+
+
+                   {/* Organization Info */}
+                   <View style={styles.orgInfo}>
+                       <Image
+                           source={{ uri: organization.orgLogo }}
+                           style={styles.orgLogo}
+                       />
+                       <Text style={styles.orgName}>{organization.orgName}</Text>
+                   </View>
+
+
+                   {/* Tags */}
+                   <View style={styles.tagsContainer}>
+                       {organization.tags.map((tag, index) => (
+                           <View key={index} style={styles.tag}>
+                               <Text style={styles.tagText}>{tag}</Text>
+                           </View>
+                       ))}
+                   </View>
+
+
+                   {/* Register Button */}
+                   <TouchableOpacity style={styles.registerButton}>
+                       <Text style={styles.registerText}>Register</Text>
+                   </TouchableOpacity>
+
+
+                   {/* Team Section */}
+                   <View style={styles.section}>
+                       <Text style={styles.sectionTitle}>The Team</Text>
+                       <View style={styles.organizerRow}>
+                           <Image
+                               source={require('../../assets/profile-placeholder.png')}
+                               style={styles.organizerAvatar}
+                           />
+                           <View style={styles.organizerDetails}>
+                               <Text style={styles.organizerName}>Organizer: {organization.organizer}</Text>
+                               <Text style={styles.organizerFrom}>From: {organization.orgName}</Text>
+                           </View>
+                           <TouchableOpacity style={styles.contactButton}>
+                               <FontAwesome name="envelope-o" size={16} color={COLORS.primary} />
+                               <Text style={styles.contactText}>Contact Organizer</Text>
+                           </TouchableOpacity>
+                       </View>
+                   </View>
+
+
+                   {/* Description Section */}
+                   <View style={styles.section}>
+                       <Text style={styles.sectionTitle}>Description</Text>
+                       <Text style={styles.description}>{organization.description}</Text>
+                   </View>
+               </View>
+           </ScrollView>
+       </SafeAreaView>
+   );
 };
 
+
 const styles = StyleSheet.create({
-  container: {
-      flex: 1,
-      padding: '5%',
-      // backgroundColor: '#fff',
-  },
-  loader: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-  },
-  image: {
-      width: '100%',
-      height: 200,
-  },
-  backButton: {
-      position: 'absolute',
-      margin: 10,
-  },
-  header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginTop: 10,
-  },
-  title: {
-      fontSize: 22,
-      fontWeight: 'bold',
-  },
-  xp: {
-      fontSize: 16,
-      color: COLORS.primary,
-  },
-  orgInfo: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginTop: 10,
-  },
-  orgLogo: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      marginRight: 10,
-  },
-  orgName: {
-      fontSize: 16,
-      fontWeight: 'bold',
-  },
-  registerButton: {
-      backgroundColor: COLORS.primary,
-      padding: 12,
-      borderRadius: 8,
-      alignItems: 'center',
-      marginVertical: 10,
-  },
-  registerText: {
-      color: 'white',
-      fontSize: 16,
-      fontWeight: 'bold',
-  },
-  section: {
-      marginTop: 20,
-  },
-  sectionTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      marginBottom: 5,
-  },
-  organizerRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginTop: 5,
-  },
-  organizerDetails: {
-      marginLeft: 10,
-      flex: 1,
-  },
-  organizerName: {
-      fontSize: 16,
-      fontWeight: 'bold',
-  },
-  organizerFrom: {
-      fontSize: 14,
-      color: '#666',
-  },
-  contactButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: 'rgba(0, 0, 0, 0.5)',
-      padding: 8,
-      borderRadius: 6,
-  },
-  contactText: {
-      color: COLORS.primary,
-      marginLeft: 5,
-  },
-  description: {
-      fontSize: 14,
-      color: '#666',
-      marginTop: 5,
-  },
+   container: {
+       flex: 1,
+   },
+   scrollView: {
+       flex: 1,
+       backgroundColor: '#fff',
+   },
+   imageContainer: {
+       position: 'relative',
+       height: 300,
+       backgroundColor: '#000',
+   },
+   headerImage: {
+       width: '100%',
+       height: '100%',
+   },
+   locationContainer: {
+       position: 'absolute',
+       bottom: 16,
+       right: 16,
+       flexDirection: 'row',
+       alignItems: 'center',
+   },
+   locationText: {
+       color: '#fff',
+       marginLeft: 6,
+       fontSize: 14,
+       fontWeight: '500',
+       textShadowColor: 'rgba(0, 0, 0, 0.75)',
+       textShadowOffset: { width: 0, height: 1 },
+       textShadowRadius: 2,
+       fontFamily: 'WorkSans-Regular',
+   },
+   backButton: {
+       position: 'absolute',
+       top: 32,
+       left: 16,
+       padding: 8,
+       zIndex: 10,
+   },
+   content: {
+       padding: 16,
+   },
+   header: {
+       flexDirection: 'row',
+       justifyContent: 'space-between',
+       alignItems: 'center',
+       marginBottom: 12,
+   },
+   title: {
+       fontSize: 24,
+       fontWeight: 'bold',
+       color: '#000',
+       fontFamily: 'WorkSans-Regular',
+   },
+   xp: {
+       fontSize: 16,
+       color: COLORS.primary,
+   },
+   orgInfo: {
+       flexDirection: 'row',
+       alignItems: 'center',
+       marginBottom: 12,
+   },
+   orgLogo: {
+       width: 24,
+       height: 24,
+       borderRadius: 12,
+       marginRight: 8,
+   },
+   orgName: {
+       fontSize: 16,
+       color: '#666',
+       fontFamily: 'WorkSans-Regular',
+   },
+   tagsContainer: {
+       flexDirection: 'row',
+       flexWrap: 'wrap',
+       gap: 8,
+       marginBottom: 16,
+   },
+   tag: {
+       backgroundColor: '#F5F5F5',
+       paddingHorizontal: 12,
+       paddingVertical: 6,
+       borderRadius: 16,
+   },
+   tagText: {
+       fontSize: 14,
+       color: '#666',
+       fontFamily: 'WorkSans-Regular',
+   },
+   registerButton: {
+    backgroundColor: '#A7C7E7',
+    padding: 16,
+    borderRadius: 25,
+    alignItems: 'center',
+    marginBottom: 12,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+},
+registerText: {
+    color: '#000000',
+    fontSize: 20,
+    fontWeight: '600',
+    fontFamily: 'WorkSans-Regular',
+    letterSpacing: 0.5,
+},
+   section: {
+       marginBottom: 24,
+   },
+   sectionTitle: {
+       fontSize: 20,
+       fontWeight: '600',
+       marginBottom: 12,
+       color: '#000',
+       fontFamily: 'WorkSans-Regular',
+   },
+   organizerRow: {
+       flexDirection: 'row',
+       alignItems: 'center',
+       paddingVertical: 8,
+   },
+   organizerAvatar: {
+       width: 40,
+       height: 40,
+       borderRadius: 20,
+   },
+   organizerDetails: {
+       marginLeft: 12,
+       flex: 1,
+   },
+   organizerName: {
+       fontSize: 16,
+       fontWeight: '500',
+       color: '#000',
+       fontFamily: 'WorkSans-Regular',
+   },
+   organizerFrom: {
+       fontSize: 14,
+       color: '#666',
+   },
+   contactButton: {
+       flexDirection: 'row',
+       alignItems: 'center',
+       borderWidth: 1,
+       borderColor: COLORS.primary,
+       paddingHorizontal: 12,
+       paddingVertical: 6,
+       borderRadius: 6,
+   },
+   contactText: {
+       color: COLORS.primary,
+       marginLeft: 5,
+       fontSize: 14,
+   },
+   description: {
+       fontSize: 16,
+       color: '#666',
+       lineHeight: 24,
+   },
+   loader: {
+       flex: 1,
+       justifyContent: 'center',
+       alignItems: 'center',
+   },
 });
 
-export default OrgPage;
+
+export default OrgDetails;
+
 
 // const OrgPage = () => {
 //     const route = useRoute();
 //     const {id, title} = route.params;
 
+
 //     const [loading, setLoading] = useState(true);
 //     const [org, setOrg] = useState({});
+
 
 //     //get the picture, title, tags, names, contact info, description, location
 //     useEffect(() => {
@@ -251,9 +378,10 @@ export default OrgPage;
 //         }, 1000); // Simulating a delay for fetching
 //     }, []);
 
+
 //     return(
 //       <SafeAreaView style={{flex: 1, backgroundColor: COLORS.lightWhite}}>
-//         {/* <Stack.Screen 
+//         {/* <Stack.Screen
 //           options={{
 //             headerStyle: { backgroundColor: COLORS.lightWhite},
 //             headerShadowVisible: false,
@@ -278,6 +406,7 @@ export default OrgPage;
 //                 <Text style={{ fontSize: 36, fontWeight: 'semi-bold' }}>{id}</Text>
 //                 <Text style={{ fontSize: 20, marginVertical: 10 }}>{title}</Text>
 
+
 //               </View>
 //                 )
 //             }
@@ -286,5 +415,4 @@ export default OrgPage;
 //       </SafeAreaView>
 //     )
 //   }
-  
-// export default OrgPage;
+ // export default OrgPage;
