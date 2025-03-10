@@ -21,11 +21,22 @@ class RegisterSerializer(serializers.Serializer):
                 display_name=display_name
             )
 
+            # Generate a username from the email (before the @)
+            username = email.split('@')[0]
+            
+            # Make sure username is unique by appending numbers if needed
+            base_username = username
+            counter = 1
+            while CustomUser.objects.filter(username=username).exists():
+                username = f"{base_username}{counter}"
+                counter += 1
+
             # Save user in PostgreSQL
             user = CustomUser.objects.create(
                 firebase_uid=firebase_user.uid,
                 email=email,
-                display_name=display_name
+                display_name=display_name,
+                username=username  # Set the unique username
             )
             return user
         except Exception as e:
