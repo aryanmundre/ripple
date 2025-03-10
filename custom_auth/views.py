@@ -21,7 +21,8 @@ class RegisterView(APIView):
             properties={
                 'email': openapi.Schema(type=openapi.TYPE_STRING, description='User email'),
                 'password': openapi.Schema(type=openapi.TYPE_STRING, description='User password'),
-                'display_name': openapi.Schema(type=openapi.TYPE_STRING, description='User display name')
+                'display_name': openapi.Schema(type=openapi.TYPE_STRING, description='User display name'),
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Username (optional, will use email if not provided)')
             }
         ),
         responses={
@@ -33,29 +34,53 @@ class RegisterView(APIView):
         email = request.data.get('email')
         password = request.data.get('password')
         display_name = request.data.get('display_name', '')
+        username = request.data.get('username', '').strip()
 
         if not email or not password:
             return Response({"error": "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Use email as username if no username provided
+        if not username:
+            username = email
+
         try:
+            # Check if user exists in our database first
+            if CustomUser.objects.filter(username=username).exists():
+                return Response({"error": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if CustomUser.objects.filter(email=email).exists():
+                return Response({"error": "Email already exists"}, status=status.HTTP_400_BAD_REQUEST)
+
             # Create user in Firebase
-            firebase_user = auth.create_user(
-                email=email,
-                password=password,
-                display_name=display_name
-            )
+            try:
+                firebase_user = auth.create_user(
+                    email=email,
+                    password=password,
+                    display_name=display_name
+                )
+            except auth.EmailAlreadyExistsError:
+                return Response({"error": "Email already exists in Firebase"}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({"error": f"Firebase error: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
 
             # Save user in PostgreSQL
-            CustomUser.objects.create(
-                firebase_uid=firebase_user.uid,
-                email=email,
-                display_name=display_name
-            )
+            try:
+                user = CustomUser.objects.create(
+                    username=username,
+                    firebase_uid=firebase_user.uid,
+                    email=email,
+                    display_name=display_name
+                )
+                return Response({
+                    "message": "User created successfully",
+                    "uid": firebase_user.uid,
+                    "username": user.username
+                }, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                # If PostgreSQL creation fails, delete the Firebase user
+                auth.delete_user(firebase_user.uid)
+                return Response({"error": f"Database error: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response({
-                "message": "User created successfully",
-                "uid": firebase_user.uid
-            }, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
