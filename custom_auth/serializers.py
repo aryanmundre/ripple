@@ -31,14 +31,28 @@ class RegisterSerializer(serializers.Serializer):
                 username = f"{base_username}{counter}"
                 counter += 1
 
+            # Check if a user with this email already exists
+            if CustomUser.objects.filter(email=email).exists():
+                raise serializers.ValidationError({"error": f"User with email {email} already exists"})
+
             # Save user in PostgreSQL
-            user = CustomUser.objects.create(
-                firebase_uid=firebase_user.uid,
-                email=email,
-                display_name=display_name,
-                username=username  # Set the unique username
-            )
-            return user
+            try:
+                user = CustomUser.objects.create(
+                    firebase_uid=firebase_user.uid,
+                    email=email,
+                    display_name=display_name,
+                    username=username  # Set the unique username
+                )
+                return user
+            except Exception as db_error:
+                # If PostgreSQL creation fails, delete the Firebase user to maintain consistency
+                try:
+                    auth.delete_user(firebase_user.uid)
+                except:
+                    pass
+                raise serializers.ValidationError({"error": f"Database error: {str(db_error)}"})
+        except auth.EmailAlreadyExistsError:
+            raise serializers.ValidationError({"error": "Email already exists in Firebase"})
         except Exception as e:
             raise serializers.ValidationError({"error": str(e)})
 
