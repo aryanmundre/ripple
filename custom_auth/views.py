@@ -412,3 +412,20 @@ class EmailVerificationView(APIView):
                            status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+
+# Get all users
+class AllUsersView(APIView):
+    @swagger_auto_schema(
+        operation_summary="Get all users",
+        responses={
+            200: UserProfileSerializer(many=True),
+            400: "Bad Request"
+        }
+    )
+    def get(self, request):
+        try:
+            users = CustomUser.objects.all()
+            serializer = UserProfileSerializer(users, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
