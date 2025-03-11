@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Dimensions, TouchableOpacity, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { COLORS } from '../constants';
 import Waves3 from '../assets/icons/Waves3.svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useFonts, MuseoModerno_700Bold, } from '@expo-google-fonts/museomoderno';
 
@@ -27,11 +28,33 @@ const activities = [
 ];
 
 const ProfileScreen = ({ navigation }) => {
+    const [name, setName] = useState('');
     // Load fonts
     const [fontsLoaded] = useFonts({
         'WorkSans-Regular': require('../assets/fonts/WorkSans-Regular.ttf'),
         MuseoModerno_700Bold,
     });
+
+    // Load profile data when component mounts or when screen is focused
+    useEffect(() => {
+        const loadProfileData = async () => {
+            try {
+                const savedProfile = await AsyncStorage.getItem('userProfile');
+                if (savedProfile) {
+                    const profileData = JSON.parse(savedProfile);
+                    setName(profileData.name || '');
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        };
+
+        loadProfileData();
+
+        // Add focus listener to reload data when screen is focused
+        const unsubscribe = navigation.addListener('focus', loadProfileData);
+        return unsubscribe;
+    }, [navigation]);
 
     // Ensure fonts are loaded before rendering UI
     if (!fontsLoaded) {
@@ -43,7 +66,7 @@ const ProfileScreen = ({ navigation }) => {
             {/* Profile Header */}
             <View style={styles.header}>
                 <Image source={require('../assets/profile-placeholder.png')} style={styles.profileImage} />
-                <Text style={styles.name}>Angel Wang</Text>
+                <Text style={styles.name}>{name || 'Enter your name'}</Text>
                 <Text style={styles.location}>Los Angeles, CA</Text>
             </View>
 
@@ -78,10 +101,8 @@ const ProfileScreen = ({ navigation }) => {
                     <Text style={styles.buttonText}>Add Friends</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.editButton}
-
-                onPress={() => navigation.navigate("ProfileSettings")}> 
-                {/* NAVIGATING TO PROFILE SETTINGS*/}
-
+                  onPress={() => navigation.navigate('ProfileSettings')}
+                > 
                     <FontAwesome name="pencil" size={16} color="white" />
                     <Text style={styles.buttonText}>Edit</Text>
                 </TouchableOpacity>

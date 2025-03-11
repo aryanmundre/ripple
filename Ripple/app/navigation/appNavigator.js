@@ -54,7 +54,6 @@ const AuthNavigator = () => (
         <AuthStack.Screen name="Signin" component={LogInSignUp} />
         <AuthStack.Screen name="Signup" component={SignupScreen} />
         <AuthStack.Screen name="Login" component={LoginScreen} />
-        <AuthStack.Screen name="ProfileSettings" component={ProfileSettings} />
         <AuthStack.Screen name="AppNavigator" component={TabNavigator} />
     </AuthStack.Navigator>
 );
