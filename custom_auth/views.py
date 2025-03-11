@@ -22,8 +22,17 @@ class RegisterView(APIView):
             properties={
                 'email': openapi.Schema(type=openapi.TYPE_STRING, description='User email'),
                 'password': openapi.Schema(type=openapi.TYPE_STRING, description='User password'),
+                'first_name': openapi.Schema(type=openapi.TYPE_STRING, description='User first name'),
+                'last_name': openapi.Schema(type=openapi.TYPE_STRING, description='User last name'),
                 'display_name': openapi.Schema(type=openapi.TYPE_STRING, description='User display name'),
-                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Username (optional, will use email if not provided)')
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Username (optional)'),
+                'date_of_birth': openapi.Schema(type=openapi.TYPE_STRING, description='Date of birth'),
+                'street_address': openapi.Schema(type=openapi.TYPE_STRING, description='Street address'),
+                'city': openapi.Schema(type=openapi.TYPE_STRING, description='City'),
+                'state': openapi.Schema(type=openapi.TYPE_STRING, description='State'),
+                'zip_code': openapi.Schema(type=openapi.TYPE_STRING, description='ZIP code'),
+                'interests': openapi.Schema(type=openapi.TYPE_OBJECT, description='User interests'),
+                'preferred_time_commitment': openapi.Schema(type=openapi.TYPE_INTEGER, description='Preferred time commitment in minutes')
             }
         ),
         responses={
@@ -34,8 +43,17 @@ class RegisterView(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
+        first_name = request.data.get('first_name', '')
+        last_name = request.data.get('last_name', '')
         display_name = request.data.get('display_name', '')
         username = request.data.get('username', '').strip()
+        date_of_birth = request.data.get('date_of_birth')
+        street_address = request.data.get('street_address', '')
+        city = request.data.get('city', '')
+        state = request.data.get('state', '')
+        zip_code = request.data.get('zip_code', '')
+        interests = request.data.get('interests', {})
+        preferred_time_commitment = request.data.get('preferred_time_commitment')
 
         if not email or not password:
             return Response({"error": "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -64,13 +82,23 @@ class RegisterView(APIView):
             except Exception as e:
                 return Response({"error": f"Firebase error: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Save user in PostgreSQL
+            # Save user in PostgreSQL with all fields
             try:
                 user = CustomUser.objects.create(
                     username=username,
                     firebase_uid=firebase_user.uid,
                     email=email,
-                    display_name=display_name
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name,
+                    display_name=display_name,
+                    date_of_birth=date_of_birth if date_of_birth else None,
+                    street_address=street_address,
+                    city=city,
+                    state=state,
+                    zip_code=zip_code,
+                    interests=interests,
+                    preferred_time_commitment=preferred_time_commitment
                 )
                 return Response({
                     "message": "User created successfully",
