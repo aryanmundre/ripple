@@ -12,6 +12,7 @@ from drf_yasg import openapi
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 import requests
+import os
 
 class RegisterView(APIView):
     @swagger_auto_schema(
@@ -130,28 +131,6 @@ class LoginView(APIView):
             404: "User not found"
         }
     )
-
-    def get_id_token(self, custom_token):
-        # Firebase REST API endpoint for token exchange
-        url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken"
-        
-        # Your Firebase project's web API key
-        api_key = "YOUR_FIREBASE_API_KEY"
-        
-        # Request payload
-        payload = {
-            "token": custom_token,
-            "returnSecureToken": True
-        }
-        
-        # Make the request
-        response = requests.post(f"{url}?key={api_key}", json=payload)
-        
-        if response.status_code == 200:
-            id_token = response.json().get("idToken")
-            return id_token
-        else:
-            raise Exception(f"Error exchanging token: {response.json()}")
     
     def post(self, request):
         email = request.data.get('email')
@@ -167,14 +146,13 @@ class LoginView(APIView):
             # Ensure user exists in PostgreSQL
             user_profile = get_object_or_404(CustomUser, firebase_uid=firebase_user.uid)
 
-            # Generate custom token for frontend
+            # Generate custom token
             custom_token = auth.create_custom_token(firebase_user.uid).decode('utf-8')
-            id_token = self.get_id_token(custom_token)
 
             return Response({
                 "message": "Login successful",
                 "uid": firebase_user.uid,
-                "id_token": id_token,
+                "custom_token": custom_token,
                 "user_profile": {
                     "email": user_profile.email,
                     "display_name": user_profile.display_name
@@ -184,7 +162,7 @@ class LoginView(APIView):
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
+
 class VerifyTokenView(APIView):
     @swagger_auto_schema(
         operation_summary="Verify a user's ID token",
