@@ -67,10 +67,13 @@ export default function LogInSignUp() {
             if (response.ok) {
                 // Store the token
                 if (data.token) {
-                    await AsyncStorage.setItem('userToken', data.token);
+                    await AsyncStorage.setItem('authToken', data.token);
                     await AsyncStorage.setItem('userData', JSON.stringify(data.user));
                 }
-                navigation.navigate("Main");
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Main' }],
+                });
             } else {
                 const errorMessage = data.detail || 
                     (typeof data === 'object' ? JSON.stringify(data) : 'Login failed. Please check your credentials.');

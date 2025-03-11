@@ -8,6 +8,7 @@ import OrgDetails from '../explore/orgDetails'
 import VisualizationScreen from '../visualizationScreen';
 import LeaderboardScreen from '../leaderboardScreen';
 import ProfileScreen from '../profileScreen';
+import ProfileSettings from '../profileSettings';
 import LogInSignUp from '../signin';
 import SignupScreen from '../signup';
 import LoginScreen from '../login';
@@ -25,6 +26,7 @@ const Tab = createBottomTabNavigator();
 const ExploreStack = createStackNavigator();
 const AuthStack = createStackNavigator();
 const RootStack = createStackNavigator();
+const ProfileStack = createStackNavigator();
 
 const ExploreNavigator = () => (
     <ExploreStack.Navigator screenOptions={{ headerShown: false }}>
@@ -32,6 +34,14 @@ const ExploreNavigator = () => (
         <ExploreStack.Screen name="OrgDetails" component={OrgDetails} />
     </ExploreStack.Navigator>
 );
+
+const ProfileNavigator = () => (
+    <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
+        <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
+        <ProfileStack.Screen name="ProfileSettings" component={ProfileSettings} />
+    </ProfileStack.Navigator>
+);
+
 const TabNavigator = () => (
     <Tab.Navigator
         screenOptions={{
@@ -51,7 +61,7 @@ const TabNavigator = () => (
         <Tab.Screen name="Leaderboard" component={LeaderboardScreen}  options={{
             tabBarIcon: ({ size, color }) => <SvgGame width={size} height={size} fill={color} />
         }}/>
-        <Tab.Screen name="Profile" component={ProfileScreen} options={{
+        <Tab.Screen name="Profile" component={ProfileNavigator} options={{
             tabBarIcon: ({ size, color }) => <SvgProfile width={size} height={size} fill={color} />
         }}/>
     </Tab.Navigator>

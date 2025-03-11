@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
-import { useFonts } from 'expo-font';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, Dimensions, TouchableOpacity, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { COLORS } from '../constants';
+import Waves3 from '../assets/icons/Waves3.svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { useFonts, MuseoModerno_700Bold, } from '@expo-google-fonts/museomoderno';
+
+const { width, height } = Dimensions.get('window');
 
 // Sample Activity Data
 const activities = [
@@ -22,11 +27,34 @@ const activities = [
     },
 ];
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ navigation }) => {
+    const [name, setName] = useState('');
     // Load fonts
     const [fontsLoaded] = useFonts({
         'WorkSans-Regular': require('../assets/fonts/WorkSans-Regular.ttf'),
+        MuseoModerno_700Bold,
     });
+
+    // Load profile data when component mounts or when screen is focused
+    useEffect(() => {
+        const loadProfileData = async () => {
+            try {
+                const savedProfile = await AsyncStorage.getItem('userProfile');
+                if (savedProfile) {
+                    const profileData = JSON.parse(savedProfile);
+                    setName(profileData.name || '');
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        };
+
+        loadProfileData();
+
+        // Add focus listener to reload data when screen is focused
+        const unsubscribe = navigation.addListener('focus', loadProfileData);
+        return unsubscribe;
+    }, [navigation]);
 
     // Ensure fonts are loaded before rendering UI
     if (!fontsLoaded) {
@@ -38,9 +66,17 @@ const ProfileScreen = () => {
             {/* Profile Header */}
             <View style={styles.header}>
                 <Image source={require('../assets/profile-placeholder.png')} style={styles.profileImage} />
-                <Text style={styles.name}>Angel Wang</Text>
+                <Text style={styles.name}>{name || 'Enter your name'}</Text>
                 <Text style={styles.location}>Los Angeles, CA</Text>
             </View>
+
+            {/* Wave Background */}
+      <View style={styles.waveContainer}>
+        <Waves3 width={width} height={460} style={{ position: 'absolute', top: 0 }} />
+      </View>     
+
+      {/* Blue Bottom Background */}
+        <View style={styles.bottomBackground} />
 
             {/* Stats */}
             <View style={styles.statsContainer}>
@@ -64,7 +100,10 @@ const ProfileScreen = () => {
                     <FontAwesome name="user-plus" size={16} color="white" />
                     <Text style={styles.buttonText}>Add Friends</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.editButton}>
+                <TouchableOpacity 
+                    style={styles.editButton}
+                    onPress={() => navigation.navigate('ProfileSettings')}
+                > 
                     <FontAwesome name="pencil" size={16} color="white" />
                     <Text style={styles.buttonText}>Edit</Text>
                 </TouchableOpacity>
@@ -93,27 +132,32 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.lightWhite,
+        backgroundColor: 'transparent',
         padding: 20,
     },
     header: {
         alignItems: 'center',
         marginBottom: 20,
+        paddingTop: 50,
+        zIndex: 2, //Brings profile section in front of the wave
     },
+
     profileImage: {
         width: 80,
         height: 80,
         borderRadius: 40,
-        marginBottom: 10,
-    },
+        marginBottom: 3,
+        marginTop: 25,
+      },
     name: {
         fontSize: 22,
-        fontFamily: 'WorkSans-Regular',
+        fontFamily: 'MuseoModerno_700Bold',
+        color: '#FFF'
     },
     location: {
         fontSize: 14,
         fontFamily: 'WorkSans-Regular',
-        color: '#666',
+        color: '#FFF',
     },
     statsContainer: {
         flexDirection: 'row',
@@ -122,6 +166,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 15,
         marginBottom: 20,
+        //marginTop: 23,
     },
     statBox: {
         alignItems: 'center',
@@ -145,7 +190,7 @@ const styles = StyleSheet.create({
     button: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.primary,
+        backgroundColor: '#7CBEEA',
         padding: 10,
         borderRadius: 8,
         flex: 1,
@@ -155,7 +200,7 @@ const styles = StyleSheet.create({
     editButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#007AFF',
+        backgroundColor: '#7CBEEA',
         padding: 10,
         borderRadius: 8,
         flex: 1,
@@ -163,7 +208,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     buttonText: {
-        color: 'white',
+        color: '#0D408A',
         fontSize: 14,
         fontFamily: 'WorkSans-Regular',
         marginLeft: 5,
@@ -172,6 +217,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontFamily: 'WorkSans-Regular',
         marginBottom: 10,
+        color: '#FFF'
     },
     activityCard: {
         flexDirection: 'row',
@@ -200,6 +246,24 @@ const styles = StyleSheet.create({
         fontFamily: 'WorkSans-Regular',
         color: COLORS.primary,
     },
+
+    waveContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: 500, // Adjust to fit your wave size
+      },
+
+      bottomBackground: {
+        position: 'absolute',
+        bottom: 0,
+        width: '140%',
+        height: '70%', // Covers only lower half
+        backgroundColor: '#0D408A', 
+        //zIndex: -2, 
+      }
+
 });
 
 export default ProfileScreen;
