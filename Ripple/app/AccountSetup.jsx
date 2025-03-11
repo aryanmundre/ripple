@@ -116,6 +116,7 @@ const AccountSetup = () => {
                                 placeholderTextColor="#A9A9A9"
                                 value={username}
                                 onChangeText={setUsername}
+                                testID="username-input"
                             />
                         </View>
 
@@ -123,6 +124,7 @@ const AccountSetup = () => {
                             <TouchableOpacity 
                                 style={styles.inputWrapper}
                                 onPress={toggleCalendar}
+                                testID="dob-input"
                             >
                                 <TextInput
                                     style={styles.input}
@@ -161,6 +163,7 @@ const AccountSetup = () => {
                                 onChangeText={setEmail}
                                 keyboardType="email-address"
                                 autoCapitalize="none"
+                                testID="email-input"
                             />
                         </View>
 
@@ -172,6 +175,7 @@ const AccountSetup = () => {
                                 value={password}
                                 onChangeText={setPassword}
                                 secureTextEntry
+                                testID="password-input"
                             />
                         </View>
                     </View>
@@ -182,6 +186,7 @@ const AccountSetup = () => {
                             {opacity: pressed ? 0.7 : 1}
                         ]}
                         onPress={handleNext}
+                        testID="next-button"
                     >
                         <Text style={styles.nextButtonText}>Next</Text>
                     </Pressable>

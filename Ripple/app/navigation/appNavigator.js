@@ -14,6 +14,7 @@ import LoginScreen from '../login';
 import AccountSetup from '../AccountSetup';
 import LocationSetup from '../LocationSetup';
 import CauseSelection from '../CauseSelection';
+import SkillSelection from '../SkillSelection';
 
 const Tab = createBottomTabNavigator();
 const ExploreStack = createStackNavigator();
@@ -87,6 +88,14 @@ const AuthNavigator = () => {
             <AuthStack.Screen 
                 name="CauseSelection" 
                 component={CauseSelection}
+                options={{
+                    gestureEnabled: true,
+                    animationEnabled: true,
+                }}
+            />
+            <AuthStack.Screen 
+                name="SkillSelection" 
+                component={SkillSelection}
                 options={{
                     gestureEnabled: true,
                     animationEnabled: true,

@@ -11,6 +11,7 @@ import {
     TouchableWithoutFeedback,
     Keyboard,
     Alert,
+    TouchableOpacity,
 } from 'react-native';
 import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
 import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
@@ -76,6 +77,7 @@ const SignupScreen = () => {
                                 placeholderTextColor="#A9A9A9"
                                 value={firstName}
                                 onChangeText={setFirstName}
+                                testID="firstName-input"
                             />
                         </View>
                         
@@ -86,16 +88,18 @@ const SignupScreen = () => {
                                 placeholderTextColor="#A9A9A9"
                                 value={lastName}
                                 onChangeText={setLastName}
+                                testID="lastName-input"
                             />
                         </View>
 
                         <View style={styles.inputWrapper}>
                             <TextInput
                                 style={styles.input}
-                                placeholder="Preferred Name"
+                                placeholder="Preferred Name (Optional)"
                                 placeholderTextColor="#A9A9A9"
                                 value={preferredName}
                                 onChangeText={setPreferredName}
+                                testID="preferredName-input"
                             />
                         </View>
                     </View>
@@ -106,6 +110,7 @@ const SignupScreen = () => {
                             {opacity: pressed ? 0.7 : 1}
                         ]}
                         onPress={handleNext}
+                        testID="next-button"
                     >
                         <Text style={styles.nextButtonText}>Next</Text>
                     </Pressable>

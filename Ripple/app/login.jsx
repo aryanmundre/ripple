@@ -123,10 +123,11 @@ export default function LogInSignUp() {
                             <Icon name="user" size={20} color="#666666" style={styles.inputIcon} />
                             <TextInput
                                 style={styles.input}
-                                placeholder="Username"
-                                placeholderTextColor="#666666"
+                                placeholder="Email"
                                 value={username}
                                 onChangeText={setUsername}
+                                autoCapitalize="none"
+                                testID="username-input"
                             />
                         </View>
 
@@ -135,10 +136,10 @@ export default function LogInSignUp() {
                             <TextInput
                                 style={styles.input}
                                 placeholder="Password"
-                                placeholderTextColor="#666666"
-                                secureTextEntry={!showPassword}
                                 value={password}
                                 onChangeText={setPassword}
+                                secureTextEntry={!showPassword}
+                                testID="password-input"
                             />
                             <TouchableOpacity 
                                 onPress={() => setShowPassword(!showPassword)}
@@ -162,6 +163,7 @@ export default function LogInSignUp() {
                         <TouchableOpacity
                             style={styles.loginButton}
                             onPress={handleLogin}
+                            testID="login-button"
                         >
                             <Text style={styles.loginButtonText}>Log In</Text>
                         </TouchableOpacity>
