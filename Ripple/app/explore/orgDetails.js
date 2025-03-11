@@ -25,7 +25,7 @@ const OrgDetails = () => {
    const navigation = useNavigation();
    const route = useRoute();
    const { id, title } = route.params;
-   const [organization, setOrganization] = useState(null);
+   const [action, setAction] = useState(null);
    const [loading, setLoading] = useState(true);
    const [fontsLoaded, setFontsLoaded] = useState(false);
    const [isStarred, setIsStarred] = useState(false);
@@ -39,40 +39,29 @@ const OrgDetails = () => {
    };
 
 
-   useEffect(() => {
-       loadFonts();
-       fetchOrganizationDetails();
-   }, []);
-
-
-   const fetchOrganizationDetails = async () => {
+   const fetchActionDetails = async () => {
        try {
-           // Simulated data for development
-           setOrganization({
-               id: 1,
-               name: 'Blood Donation',
-               xp: 50,
-               orgName: 'American Red Cross',
-               orgLogo: 'https://placehold.co/80/ff0000/ffffff.png?text=RC',
-               thumbnail: 'https://placehold.co/1000x600/ff0000/ffffff.png?text=Blood+Donation',
-               description: 'Join us for a blood donation drive and save lives! Our experienced team will ensure a safe and comfortable donation process.',
-               organizer: 'Lisa Ripple',
-               location: 'Los Angeles, CA',
-               tags: ['Medical Assistance', 'Disability Support']
-           });
+           const response = await fetch(`https://ripple-z6px.onrender.com/api/actions/${id}/`);
+           const data = await response.json();
+           setAction(data);
        } catch (error) {
-           console.error("Error fetching data:", error.message);
+           console.error("Error fetching action details:", error.message);
        } finally {
            setLoading(false);
        }
    };
 
+   useEffect(() => {
+       loadFonts();
+       fetchActionDetails();
+   }, [id]);
+
    const handleStarPress = () => {
-    setIsStarred(!isStarred);
+       setIsStarred(!isStarred);
    };
 
 
-   if (loading || !fontsLoaded) {
+   if (loading || !fontsLoaded || !action) {
        return <ActivityIndicator size="large" color={COLORS.primary} style={styles.loader} />;
    }
 
@@ -81,13 +70,13 @@ const OrgDetails = () => {
        <SafeAreaView style={[styles.container, { backgroundColor: 'transparent' }]}>
            <View style={styles.imageContainer}>
                <Image
-                   source={{ uri: organization.thumbnail }}
+                   source={{ uri: action.thumbnail }}
                    style={styles.headerImage}
                    resizeMode="cover"
                />
                <View style={styles.locationContainer}>
                    <LocationPin width={16} height={16} fill="#fff" />
-                   <Text style={styles.locationText}>{organization.location}</Text>
+                   <Text style={styles.locationText}>{action.location || 'Location not specified'}</Text>
                </View>
                <TouchableOpacity
                    style={styles.backButton}
@@ -103,7 +92,7 @@ const OrgDetails = () => {
                    {/* Title Section */}
                    <View style={styles.header}>
                        <Text style={styles.title}>
-                           {organization.name} <Text style={styles.xp}>{organization.xp}XP</Text>
+                           {action.name} <Text style={styles.xp}>{action.xp || 50}XP</Text>
                        </Text>
                        <TouchableOpacity 
                             onPress={handleStarPress}
@@ -121,20 +110,21 @@ const OrgDetails = () => {
                    {/* Organization Info */}
                    <View style={styles.orgInfo}>
                        <Image
-                           source={{ uri: organization.orgLogo }}
+                           source={{ uri: action.organization_logo || 'https://ripple-z6px.onrender.com/default_thumbnail.png' }}
                            style={styles.orgLogo}
                        />
-                       <Text style={styles.orgName}>{organization.orgName}</Text>
+                       <Text style={styles.orgName}>{action.organization}</Text>
                    </View>
 
 
                    {/* Tags */}
                    <View style={styles.tagsContainer}>
-                       {organization.tags.map((tag, index) => (
-                           <View key={index} style={styles.tag}>
-                               <Text style={styles.tagText}>{tag}</Text>
-                           </View>
-                       ))}
+                       <View style={styles.tag}>
+                           <Text style={styles.tagText}>{action.category}</Text>
+                       </View>
+                       <View style={styles.tag}>
+                           <Text style={styles.tagText}>{action.action_type}</Text>
+                       </View>
                    </View>
 
 
@@ -153,8 +143,8 @@ const OrgDetails = () => {
                                style={styles.organizerAvatar}
                            />
                            <View style={styles.organizerDetails}>
-                               <Text style={styles.organizerName}>Organizer: {organization.organizer}</Text>
-                               <Text style={styles.organizerFrom}>From: {organization.orgName}</Text>
+                               <Text style={styles.organizerName}>Organizer: {action.organizer || 'Team Lead'}</Text>
+                               <Text style={styles.organizerFrom}>From: {action.organization}</Text>
                            </View>
                            <TouchableOpacity style={styles.contactButton}>
                                <FontAwesome name="envelope-o" size={16} color={COLORS.primary} />
@@ -167,7 +157,7 @@ const OrgDetails = () => {
                    {/* Description Section */}
                    <View style={styles.section}>
                        <Text style={styles.sectionTitle}>Description</Text>
-                       <Text style={styles.description}>{organization.description}</Text>
+                       <Text style={styles.description}>{action.description || 'No description available.'}</Text>
                    </View>
                </View>
            </ScrollView>
@@ -270,77 +260,72 @@ const styles = StyleSheet.create({
        fontFamily: 'WorkSans-Regular',
    },
    registerButton: {
-    backgroundColor: '#A7C7E7',
-    padding: 16,
-    borderRadius: 25,
-    alignItems: 'center',
-    marginBottom: 12,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-},
-registerText: {
-    color: '#000000',
-    fontSize: 20,
-    fontWeight: '600',
-    fontFamily: 'WorkSans-Regular',
-    letterSpacing: 0.5,
-},
+       backgroundColor: COLORS.primary,
+       paddingVertical: 12,
+       borderRadius: 8,
+       alignItems: 'center',
+       marginBottom: 24,
+   },
+   registerText: {
+       color: '#fff',
+       fontSize: 16,
+       fontWeight: '600',
+       fontFamily: 'WorkSans-Regular',
+   },
    section: {
        marginBottom: 24,
    },
    sectionTitle: {
-       fontSize: 20,
+       fontSize: 18,
        fontWeight: '600',
        marginBottom: 12,
-       color: '#000',
        fontFamily: 'WorkSans-Regular',
    },
    organizerRow: {
        flexDirection: 'row',
        alignItems: 'center',
-       paddingVertical: 8,
+       backgroundColor: '#F5F5F5',
+       padding: 12,
+       borderRadius: 8,
    },
    organizerAvatar: {
        width: 40,
        height: 40,
        borderRadius: 20,
+       marginRight: 12,
    },
    organizerDetails: {
-       marginLeft: 12,
        flex: 1,
    },
    organizerName: {
-       fontSize: 16,
+       fontSize: 14,
        fontWeight: '500',
-       color: '#000',
        fontFamily: 'WorkSans-Regular',
    },
    organizerFrom: {
-       fontSize: 14,
+       fontSize: 12,
        color: '#666',
+       fontFamily: 'WorkSans-Regular',
    },
    contactButton: {
        flexDirection: 'row',
        alignItems: 'center',
-       borderWidth: 1,
-       borderColor: COLORS.primary,
+       backgroundColor: '#fff',
        paddingHorizontal: 12,
        paddingVertical: 6,
-       borderRadius: 6,
+       borderRadius: 16,
+       gap: 6,
    },
    contactText: {
+       fontSize: 12,
        color: COLORS.primary,
-       marginLeft: 5,
-       fontSize: 14,
+       fontFamily: 'WorkSans-Regular',
    },
    description: {
-       fontSize: 16,
-       color: '#666',
+       fontSize: 14,
        lineHeight: 24,
+       color: '#444',
+       fontFamily: 'WorkSans-Regular',
    },
    loader: {
        flex: 1,

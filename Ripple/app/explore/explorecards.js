@@ -18,82 +18,89 @@ import Waves from '../../assets/background/explore_wave.svg';
 const ExploreCards = () => {
   const [actions, setActions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [orgs, setOrgs] = useState({});
-  const [searchMode, setSearchMode] = useState(false)
+  const [searchMode, setSearchMode] = useState(false);
   const [search, setSearch] = useState('');
+  const [nextPage, setNextPage] = useState(null);
   const searchRef = useRef(null);
-
+  const [fontsLoaded, setFontsLoaded] = useState(false);
   
   const width = Dimensions.get('window').width;
-  const height= Dimensions.get('window').height;
+  const height = Dimensions.get('window').height;
+
   const loadFonts = async () => {
     await Font.loadAsync({
       'default-font': require('../../assets/fonts/MuseoModerno-SemiBold.ttf'),
     });
     setFontsLoaded(true);
   };
+
+  const fetchActions = async () => {
+    try {
+      const response = await fetch('https://ripple-z6px.onrender.com/api/actions/feed/');
+      const data = await response.json();
+      setActions(data.results);
+      setNextPage(data.next);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching actions:', error);
+      setLoading(false);
+    }
+  };
+
+  const loadMoreActions = async () => {
+    if (!nextPage) return;
+    
+    try {
+      const response = await fetch(nextPage);
+      const data = await response.json();
+      setActions([...actions, ...data.results]);
+      setNextPage(data.next);
+    } catch (error) {
+      console.error('Error loading more actions:', error);
+    }
+  };
   
   useEffect(() => {
-    // Simulate fetching data from backend or API    
-    loadFonts();    
-    setTimeout(() => {
-      setOrgs([
-          {
-            id: 1,
-            title: 'Blood Donation',
-            headerImage: 'https://via.placeholder.com/150',
-            profile_picture: 'https://example.com/icon1.png',
-            name: 'American Red Cross',
-          },
-          {
-            id: 2,
-            title: 'Org 2',
-            headerImage: 'https://example.com/header2.jpg',
-            profile_picture: 'https://example.com/icon2.png',
-            name: 'Description for Org 2',
-          },
-          {
-            id: 3,
-            title: 'Ecoasia',
-            headerImage: 'https://via.placeholder.com/150',
-            profile_picture: 'https://example.com/icon1.png',
-            name: 'I want to plant treees',
-        },
-        {
-            id: 4,
-            title: 'Org 4',
-            headerImage: 'https://example.com/header2.jpg',
-            profile_picture: 'https://example.com/icon2.png',
-            name: 'This is the 4th org',
-        },
-          // Add more organizations as needed
-      ]);
-      setLoading(false);
-    }, 2000); // Simulating a delay for fetching
-
-    // Orientation.lockToPortrait(); //react native screen lock not compatible with expo-go
+    loadFonts();
+    fetchActions();
     ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
   }, []);
 
-  const renderOrgCards = () => {
-    const orgList = [];
-    for (let i = 0; i < orgs.length; i += 2) {
+  const renderActionCards = () => {
+    const rows = [];
+    for (let i = 0; i < actions.length; i += 2) {
       const row = (
-        <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between',  flexWrap: 'wrap'}}>
-          <OrgCard width={width} organization={orgs[i]} />
-          <OrgCard width={width} organization={orgs[i + 1]} />
+        <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+          <OrgCard width={width} organization={{
+            id: actions[i].id,
+            title: actions[i].name,
+            headerImage: actions[i].thumbnail,
+            name: actions[i].organization,
+            category: actions[i].category,
+            action_type: actions[i].action_type
+          }} />
+          {i + 1 < actions.length && (
+            <OrgCard width={width} organization={{
+              id: actions[i + 1].id,
+              title: actions[i + 1].name,
+              headerImage: actions[i + 1].thumbnail,
+              name: actions[i + 1].organization,
+              category: actions[i + 1].category,
+              action_type: actions[i + 1].action_type
+            }} />
+          )}
         </View>
       );
-      orgList.push(row);
+      rows.push(row);
     }
-    return orgList;
+    return rows;
   };
 
   return(
     <SafeAreaView style={{flex: 1, backgroundColor: COLORS.bg_color}}>
       {/* background layer */}
       <View style={{position:'absolute', flex: 1, bottom: 0, zIndex:-1}}>
-        <Waves width={width} height={height*0.4}style={{zIndex: 0}}/>
+        <Waves width={width} height={height*0.4} style={{zIndex: 0}}/>
       </View>
       {/* search mode */}
       { searchMode ? 
@@ -106,18 +113,30 @@ const ExploreCards = () => {
             <TextInput
                 style={{ flex: 1, height: 40, margin: '2%', paddingLeft: 6, paddingRight: 6, color: 'rgb(39, 39, 39)', borderColor: 'rgba(153, 72, 72, 0.2)', borderRadius: 10, backgroundColor: COLORS.lightWhite}}
                 placeholder="Search..."
-                placeholderTextColor={'rbg(39, 39, 39'}
+                placeholderTextColor={'rgb(39, 39, 39)'}
                 value={search}
                 ref={searchRef}
-                onChangeText={setSearch} // Update search query when user types
+                onChangeText={setSearch}
             />
           </View>  
           
           {/* generated content */}
+          <ScrollView contentContainerStyle={{}}>
+            {renderActionCards()}
+          </ScrollView>
         </>)
-
         :
-        (<ScrollView contentContainerStyle={{}}>
+        (<ScrollView 
+          contentContainerStyle={{}}
+          onScroll={({nativeEvent}) => {
+            const {layoutMeasurement, contentOffset, contentSize} = nativeEvent;
+            const isEndReached = layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
+            if (isEndReached && !loading) {
+              loadMoreActions();
+            }
+          }}
+          scrollEventThrottle={400}
+        >
           <View style={{alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row', marginLeft: 10, marginTop: 5, marginRight: 20, zIndex: 1}}>
             <TouchableOpacity>
               <Container width={40} height={40}/>
@@ -131,11 +150,11 @@ const ExploreCards = () => {
           </View>
 
           {/* main content */}
-          { loading ? (<ActivityIndicator size="large" color={COLORS.primary}/>) : renderOrgCards()}
+          { loading ? (<ActivityIndicator size="large" color={COLORS.primary}/>) : renderActionCards()}
         </ScrollView>
       )}
     </SafeAreaView>
-  )
+  );
 }
-  
+
 export default ExploreCards;
