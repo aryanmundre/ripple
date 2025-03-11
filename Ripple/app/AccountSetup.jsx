@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     SafeAreaView, 
     View, 
@@ -15,14 +15,13 @@ import {
     Alert,
 } from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
-import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
-import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProgressBar from "../assets/icons/progressBar2.svg";  
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";  
 import Icon from "react-native-vector-icons/Feather";
+import * as Font from 'expo-font';
 
 const { width, height } = Dimensions.get('window');
 
@@ -34,12 +33,30 @@ const AccountSetup = () => {
     const [showCalendar, setShowCalendar] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
 
-    let [fontsLoaded] = useFonts({
-        MuseoModerno_400Regular,
-        WorkSans_400Regular,
-    });
+    useEffect(() => {
+        async function loadFonts() {
+            await Font.loadAsync({
+                'MuseoModerno': require('../assets/fonts/MuseoModerno-Regular.ttf'),
+                'WorkSans': require('../assets/fonts/WorkSans-Regular.ttf'),
+            });
+            setFontsLoaded(true);
+        }
+        loadFonts();
+    }, []);
+
+    if (!fontsLoaded) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.content}>
+                    <Text>Loading...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     const handleNext = async () => {
         if (!username || !dateOfBirth || !email || !password) {
@@ -144,7 +161,7 @@ const AccountSetup = () => {
                                         selectedDayTextColor="#FFFFFF"
                                         width={width * 0.85}
                                         textStyle={{
-                                            fontFamily: 'WorkSans_400Regular',
+                                            fontFamily: 'WorkSans',
                                             color: '#333333',
                                         }}
                                     />
@@ -171,8 +188,14 @@ const AccountSetup = () => {
                                 placeholderTextColor="#A9A9A9"
                                 value={password}
                                 onChangeText={setPassword}
-                                secureTextEntry
+                                secureTextEntry={!showPassword}
                             />
+                            <TouchableOpacity
+                                style={styles.eyeIcon}
+                                onPress={() => setShowPassword(!showPassword)}
+                            >
+                                <Icon name={showPassword ? "eye" : "eye-off"} size={20} color="#A9A9A9" />
+                            </TouchableOpacity>
                         </View>
                     </View>
 
@@ -218,7 +241,7 @@ const styles = StyleSheet.create({
     title: {
         color: 'white',
         fontSize: 36,
-        fontFamily: 'MuseoModerno_400Regular',
+        fontFamily: 'MuseoModerno',
         marginBottom: 20,
     },
     progressBarContainer: {
@@ -229,7 +252,7 @@ const styles = StyleSheet.create({
     subtitle: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         marginBottom: 20,
     },
     inputContainer: {
@@ -247,7 +270,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 25,
         paddingHorizontal: 20,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         fontSize: 16,
     },
     calendarIcon: {
@@ -266,7 +289,7 @@ const styles = StyleSheet.create({
     nextButtonText: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
     },
     waveContainer: {
         position: "absolute",
@@ -311,6 +334,11 @@ const styles = StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 5,
         zIndex: 1000,
+    },
+    eyeIcon: {
+        position: 'absolute',
+        right: 20,
+        top: 15,
     },
 });
 

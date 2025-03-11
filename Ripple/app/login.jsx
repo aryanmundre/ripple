@@ -15,9 +15,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { useNavigation } from "@react-navigation/native";
-import { useFonts } from 'expo-font';
-import { MuseoModerno_400Regular } from "@expo-google-fonts/museomoderno";
-import { WorkSans_400Regular } from "@expo-google-fonts/work-sans";
+import * as Font from 'expo-font';
 import SvgWave from "../assets/icons/Wave.svg";  
 import { API_ENDPOINTS, handleApiError } from "../constants/api";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -36,11 +34,18 @@ export default function LogInSignUp() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
 
-    const [fontsLoaded] = useFonts({
-        'MuseoModerno': MuseoModerno_400Regular,
-        'WorkSans': WorkSans_400Regular,
-    });
+    React.useEffect(() => {
+        async function loadFonts() {
+            await Font.loadAsync({
+                'MuseoModerno': require('../assets/fonts/MuseoModerno-Regular.ttf'),
+                'WorkSans': require('../assets/fonts/WorkSans-Regular.ttf'),
+            });
+            setFontsLoaded(true);
+        }
+        loadFonts();
+    }, []);
 
     const handleLogin = async () => {
         if (!username || !password) {

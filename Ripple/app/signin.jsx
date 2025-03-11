@@ -10,24 +10,38 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { useNavigation } from "@react-navigation/native";
-import {useFonts, Judson_700Bold, } from "@expo-google-fonts/judson";
-import {MuseoModerno_400Regular, } from "@expo-google-fonts/museomoderno";
-import { Lato_500Medium, } from "@expo-google-fonts/lato";
-import { WorkSans_400Regular, } from "@expo-google-fonts/work-sans";
+import * as Font from 'expo-font';
+import { useState, useEffect } from 'react';
 import SvgWave from "../assets/icons/Wave.svg";  
 
 const { width, height } = Dimensions.get("window");
 
 export default function LogInSignUp() {
     const navigation = useNavigation();
+    const [fontsLoaded, setFontsLoaded] = useState(false);
 
-    const [fontsLoaded] = useFonts({
-        Judson_700Bold,
-        MuseoModerno_400Regular,
-        Lato_500Medium,
-        WorkSans_400Regular,
-    });
+    useEffect(() => {
+        async function loadFonts() {
+            await Font.loadAsync({
+                'Judson-Bold': require('../assets/fonts/Judson-Bold.ttf'),
+                'MuseoModerno': require('../assets/fonts/MuseoModerno-Regular.ttf'),
+                'Lato-Medium': require('../assets/fonts/Lato-Medium.ttf'),
+                'WorkSans': require('../assets/fonts/WorkSans-Regular.ttf'),
+            });
+            setFontsLoaded(true);
+        }
+        loadFonts();
+    }, []);
 
+    if (!fontsLoaded) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.content}>
+                    <Text>Loading...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -105,7 +119,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 96,
         fontWeight: "700",
-        fontFamily: "Judson_700Bold",
+        fontFamily: "Judson-Bold",
         color: "black",
         textAlign: "center",
         position: "absolute",
@@ -118,16 +132,16 @@ const styles = StyleSheet.create({
         left: '10%',
         right: '10%',
         alignItems: 'left',
-        fontFamily: "WorkSans_400Regular",
+        fontFamily: "WorkSans",
     },
     welcomeText: {
         fontSize: 36,
-        fontFamily: "MuseoModerno_400Regular",
+        fontFamily: "MuseoModerno",
         color: "white",
     },
     subtitle: {
         fontSize: 16,
-        fontFamily: "WorkSans_400Regular",
+        fontFamily: "WorkSans",
         fontWeight: "500",
         color: "white",
         textAlign: "left",
@@ -168,7 +182,7 @@ const styles = StyleSheet.create({
     },
     socialText: {
         fontSize: 16,
-        fontFamily: "WorkSans_400Regular",
+        fontFamily: "WorkSans",
         fontWeight: "500",
         color: "white",
         marginBottom: 12,

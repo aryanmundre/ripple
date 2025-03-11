@@ -1,5 +1,5 @@
 //Third page
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     SafeAreaView, 
     View, 
@@ -12,13 +12,12 @@ import {
     Keyboard,
     Alert,
 } from 'react-native';
-import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
-import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ProgressBar from "../assets/icons/progressBar.svg";  
+import ProgressBar from "../assets/icons/progressBar1.svg";  
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";  
+import * as Font from 'expo-font';
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,11 +28,28 @@ const SignupScreen = () => {
     const [lastName, setLastName] = useState('');
     const [preferredName, setPreferredName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
 
-    let [fontsLoaded] = useFonts({
-        MuseoModerno_400Regular,
-        WorkSans_400Regular,
-    });
+    useEffect(() => {
+        async function loadFonts() {
+            await Font.loadAsync({
+                'MuseoModerno': require('../assets/fonts/MuseoModerno-Regular.ttf'),
+                'WorkSans': require('../assets/fonts/WorkSans-Regular.ttf'),
+            });
+            setFontsLoaded(true);
+        }
+        loadFonts();
+    }, []);
+
+    if (!fontsLoaded) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.content}>
+                    <Text>Loading...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     const handleNext = async () => {
         if (!firstName || !lastName) {
@@ -142,7 +158,7 @@ const styles = StyleSheet.create({
     title: {
         color: 'white',
         fontSize: 36,
-        fontFamily: 'MuseoModerno_400Regular',
+        fontFamily: 'MuseoModerno',
         marginBottom: 20,
     },
     progressBarContainer: {
@@ -153,7 +169,7 @@ const styles = StyleSheet.create({
     subtitle: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         marginBottom: 20,
     },
     inputContainer: {
@@ -171,7 +187,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 25,
         paddingHorizontal: 20,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         fontSize: 16,
     },
     nextButton: {
@@ -185,7 +201,7 @@ const styles = StyleSheet.create({
     nextButtonText: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
     },
     waveContainer: {
         position: "absolute",

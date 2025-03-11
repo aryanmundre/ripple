@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     SafeAreaView, 
     View, 
@@ -7,10 +7,12 @@ import {
     Dimensions,
     Pressable,
     TouchableOpacity,
+    ScrollView,
 } from 'react-native';
-import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
-import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
 import { useNavigation } from "@react-navigation/native";
+import * as Font from 'expo-font';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_ENDPOINTS } from "../constants/api";
 import ProgressBar from "../assets/icons/progressBar5.svg";  
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";
@@ -27,10 +29,22 @@ const skills = [
     { id: 5, title: "I'm just here to serve kindness!" },
 ];
 
-const SkillSelection = () => {
+export default function SkillSelection() {
     const navigation = useNavigation();
     const [selectedSkills, setSelectedSkills] = useState([]);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
     
+    useEffect(() => {
+        async function loadFonts() {
+            await Font.loadAsync({
+                'MuseoModerno': require('../assets/fonts/MuseoModerno-Regular.ttf'),
+                'WorkSans': require('../assets/fonts/WorkSans-Regular.ttf'),
+            });
+            setFontsLoaded(true);
+        }
+        loadFonts();
+    }, []);
+
     const handleNext = () => {
         navigation.navigate('VolunteerPreferences');
     };
@@ -47,13 +61,14 @@ const SkillSelection = () => {
         });
     };
 
-    let [fontsLoaded] = useFonts({
-        MuseoModerno_400Regular,
-        WorkSans_400Regular,
-    });
-
     if (!fontsLoaded) {
-        return null;
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.content}>
+                    <Text>Loading...</Text>
+                </View>
+            </SafeAreaView>
+        );
     }
 
     return (
@@ -108,7 +123,7 @@ const SkillSelection = () => {
             <View style={styles.bottomWhiteBackground} />
         </SafeAreaView>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -128,7 +143,7 @@ const styles = StyleSheet.create({
     title: {
         color: 'white',
         fontSize: 32,
-        fontFamily: 'MuseoModerno_400Regular',
+        fontFamily: 'MuseoModerno',
         marginBottom: 15,
     },
     progressBarContainer: {
@@ -139,14 +154,14 @@ const styles = StyleSheet.create({
     subtitle: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         marginBottom: 6,
         textAlign: 'center',
     },
     subHeader: {
         color: 'white',
         fontSize: 12,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         marginBottom: 20,
         opacity: 0.8,
         textAlign: 'center',
@@ -177,7 +192,7 @@ const styles = StyleSheet.create({
     skillText: {
         color: '#333333',
         fontSize: 14,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
     },
     nextButton: {
         backgroundColor: '#5AA8DC',
@@ -191,7 +206,7 @@ const styles = StyleSheet.create({
     nextButtonText: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
     },
     waveContainer: {
         position: "absolute",
@@ -214,6 +229,4 @@ const styles = StyleSheet.create({
         zIndex: 0,
         pointerEvents: 'none',
     },
-});
-
-export default SkillSelection; 
+}); 
