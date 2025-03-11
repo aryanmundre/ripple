@@ -140,7 +140,7 @@ class LoginView(APIView):
             user_profile = get_object_or_404(CustomUser, firebase_uid=firebase_user.uid)
 
             # Generate custom token for frontend
-            custom_token = auth.create_custom_token(firebase_user.uid)
+            custom_token = auth.create_custom_token(firebase_user.uid).decode('utf-8')
             id_token = self.get_id_token(custom_token)
 
             return Response({
