@@ -103,7 +103,7 @@ class LoginView(APIView):
         }
     )
 
-    def get_id_token(custom_token):
+    def get_id_token(self, custom_token):
         # Firebase REST API endpoint for token exchange
         url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken"
         
