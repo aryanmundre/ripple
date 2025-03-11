@@ -80,11 +80,8 @@ const AccountSetup = () => {
     const onDateChange = (date) => {
         if (date) {
             const selectedDate = new Date(date);
-            const formattedDate = selectedDate.toLocaleDateString('en-US', {
-                month: '2-digit',
-                day: '2-digit',
-                year: 'numeric'
-            });
+            // Format date as YYYY-MM-DD for backend compatibility
+            const formattedDate = selectedDate.toISOString().split('T')[0];
             setDateOfBirth(formattedDate);
         }
         setShowCalendar(false);

@@ -67,12 +67,12 @@ const LocationSetup = () => {
                 email: signupData.email,
                 password: signupData.password,
                 date_of_birth: signupData.dateOfBirth,
-                address: {
-                    street: streetAddress,
-                    city,
-                    state,
-                    zip_code: zipCode
-                }
+                street_address: streetAddress.trim(),
+                city: city.trim(),
+                state: state.trim(),
+                zip_code: zipCode.trim(),
+                interests: signupData.interests || {},
+                preferred_time_commitment: signupData.preferredTimeCommitment || null
             };
 
             console.log('Registration Data:', JSON.stringify(registrationData, null, 2));

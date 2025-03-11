@@ -7,6 +7,7 @@ import {
     Dimensions,
     Pressable,
     TouchableOpacity,
+    Alert,
 } from 'react-native';
 import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
 import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
@@ -15,6 +16,7 @@ import ProgressBar from "../assets/icons/progressBar4.svg";
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";  
 import ImagePlaceholder from "../assets/icons/imageplaceholder.svg";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -31,8 +33,35 @@ const CauseSelection = () => {
     const navigation = useNavigation();
     const [selectedCauses, setSelectedCauses] = useState([]);
     
-    const handleNext = () => {
-        navigation.navigate('SkillSelection');
+    const handleNext = async () => {
+        try {
+            // Convert selected causes to interests object
+            const interestsObject = causes.reduce((acc, cause) => {
+                acc[cause.title.toLowerCase().replace(/\s+/g, '_')] = selectedCauses.includes(cause.id);
+                return acc;
+            }, {});
+
+            // Get existing signup data
+            const existingData = await AsyncStorage.getItem('signupData');
+            const signupData = JSON.parse(existingData || '{}');
+            
+            // Add interests to signup data
+            const updatedData = {
+                ...signupData,
+                interests: interestsObject,
+                // Default to 60 minutes if not set
+                preferredTimeCommitment: signupData.preferredTimeCommitment || 60
+            };
+            
+            // Save updated data
+            await AsyncStorage.setItem('signupData', JSON.stringify(updatedData));
+            
+            // Navigate to next screen
+            navigation.navigate('SkillSelection');
+        } catch (error) {
+            console.error('Error saving cause selection:', error);
+            Alert.alert('Error', 'Could not save your cause selections. Please try again.');
+        }
     };
 
     const toggleCause = (causeId) => {
