@@ -16,6 +16,11 @@ import LocationSetup from '../LocationSetup';
 import CauseSelection from '../CauseSelection';
 import SkillSelection from '../SkillSelection';
 
+import SvgExplore from '../../assets/icons/Compass.svg';
+import SvgHeart from '../../assets/icons/Heart.svg';
+import SvgGame from '../../assets/icons/Game.svg';
+import SvgProfile from '../../assets/icons/Profile.svg';
+
 const Tab = createBottomTabNavigator();
 const ExploreStack = createStackNavigator();
 const AuthStack = createStackNavigator();
@@ -23,11 +28,10 @@ const RootStack = createStackNavigator();
 
 const ExploreNavigator = () => (
     <ExploreStack.Navigator screenOptions={{ headerShown: false }}>
-        <ExploreStack.Screen name="ExploreHome" component={ExploreScreen} />
-        <ExploreStack.Screen name="OrganizationDetails" component={OrganizationDetails} />
+        <ExploreStack.Screen name="ExploreHome" component={ExploreCards} />
+        <ExploreStack.Screen name="OrgDetails" component={OrgDetails} />
     </ExploreStack.Navigator>
 );
-
 const TabNavigator = () => (
     <Tab.Navigator
         screenOptions={{
@@ -123,7 +127,7 @@ const AuthNavigator = () => {
 const AppNavigator = () => (
     <NavigationContainer>
         <RootStack.Navigator screenOptions={{ headerShown: false }}>
-            <RootStack.Screen name="Auth" component={AuthNavigator} />
+            
             <RootStack.Screen name="Main" component={TabNavigator} />
         </RootStack.Navigator>
     </NavigationContainer>

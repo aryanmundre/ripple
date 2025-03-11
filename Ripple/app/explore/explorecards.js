@@ -3,7 +3,7 @@ import { View, Text, TextInput, FlatList, ScrollView, SafeAreaView, TouchableOpa
 // import Orientation from 'react-native-orientation-locker';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { OrgCard } from '../../components';
+import OrgCard from '../../components/explore/OrgCard.jsx';
 import { COLORS, icons, images, SIZES } from "../../constants";
 import styles from '../../styles/test.js';
 import * as Font from 'expo-font';

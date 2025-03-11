@@ -1,8 +1,16 @@
 {
   "expo": {
-    "scheme": "acme",
+    "orientation": "portrait",
+    "ios": {
+      "requireFullScreen": true
+    },
+    "scheme": "ripple",
+    "web": {
+      "bundler": "metro"
+    },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      "expo-router"
     ],
     "name": "Ripple",
     "slug": "Ripple",
