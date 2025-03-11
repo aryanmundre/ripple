@@ -22,7 +22,6 @@ import {
   Dimensions,
 } from 'react-native';
 
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useNavigationState } from '@react-navigation/native';
 
@@ -58,6 +57,7 @@ const headerOpacity = scrollY.interpolate({
 });
 
 const [showPassword, setShowPassword] = useState(false);
+const [city, setCity] = useState('');
 
   // Load saved profile data when component mounts
   useEffect(() => {
@@ -73,6 +73,7 @@ const [showPassword, setShowPassword] = useState(false);
         setPreferredName(profileData.preferredName || '');
         setEmail(profileData.email || '');
         setStreetAddress(profileData.streetAddress || '');
+        setCity(profileData.city || '');
         setZipCode(profileData.zipCode || '');
         setState(profileData.state || '');
         setPassionateCause(profileData.passionateCause || '');
@@ -91,6 +92,7 @@ const [showPassword, setShowPassword] = useState(false);
         preferredName,
         email,
         streetAddress,
+        city,
         zipCode,
         state,
         passionateCause,
@@ -139,73 +141,6 @@ const [showPassword, setShowPassword] = useState(false);
 
   const renderLocationInput = useCallback(() => (
     <View style={styles.locationContainer}>
-      <GooglePlacesAutocomplete
-        placeholder="Enter your location"
-        fetchDetails={true}
-        enablePoweredByContainer={false}
-        minLength={2}
-        onPress={(data, details = null) => {
-          setLocation(data.description);
-        }}
-        query={{
-          key: 'AIzaSyCyc1ePeZbeHq5xO98a-0DL3HWhjoOecwY', // Replace this with the new key you just created
-          language: 'en',
-          types: 'establishment'
-        }}
-        styles={{
-          container: {
-            flex: 0,
-          },
-          textInputContainer: {
-            width: '100%',
-            borderWidth: 1,
-            borderColor: '#ccc',
-            borderRadius: 8,
-            backgroundColor: '#fff',
-          },
-          textInput: {
-            height: 40,
-            fontSize: 14,
-            color: '#333',
-            backgroundColor: '#fff',
-            paddingHorizontal: 10,
-          },
-          listView: {
-            backgroundColor: '#fff',
-            borderWidth: 1,
-            borderColor: '#ccc',
-            borderRadius: 8,
-            maxHeight: 150,
-            position: 'absolute',
-            top: 45,
-            left: 0,
-            right: 0,
-            zIndex: 9999,
-            elevation: 3,
-          },
-        }}
-        onFail={(error) => {
-          console.error('Places Error:', error);
-          console.error('Full error object:', JSON.stringify(error, null, 2));
-        }}
-        onNotFound={() => {
-          console.log('No results found');
-        }}
-        onTimeout={() => {
-          console.log('Request timeout');
-        }}
-        timeout={15000}
-        textInputProps={{
-          autoCorrect: false,
-          clearButtonMode: 'while-editing',
-        }}
-        enableHighAccuracyLocation={true}
-        GooglePlacesSearchQuery={{
-          rankby: 'distance'
-        }}
-        suppressDefaultStyles={false}
-        numberOfLines={2}
-      />
     </View>
   ), []);
 
@@ -326,6 +261,19 @@ const [showPassword, setShowPassword] = useState(false);
               />
               <FontAwesome name="pencil" size={16} color="#A9A9A9" style={styles.editIcon} />
             </View>
+          </View>
+
+          <View style={[styles.locationRowContainer, { marginTop: 10 }]}>
+            <View style={[styles.inputContainer, styles.cityContainer]}>
+              <TextInput 
+                style={styles.textInput}
+                value={city}
+                onChangeText={setCity}
+                placeholder="City"
+                placeholderTextColor="#A9A9A9"
+              />
+              <FontAwesome name="pencil" size={16} color="#A9A9A9" style={styles.editIcon} />
+            </View>
             <View style={[styles.inputContainer, styles.zipCodeContainer]}>
               <TextInput 
                 style={styles.textInput}
@@ -348,57 +296,57 @@ const [showPassword, setShowPassword] = useState(false);
               dropdownIconColor="#333"
               mode="dropdown"
             >
-              <Picker.Item label="State" value="" color="#333" />
-              <Picker.Item label="Alabama" value="AL" color="#333" />
-              <Picker.Item label="Alaska" value="AK" color="#333" />
-              <Picker.Item label="Arizona" value="AZ" color="#333" />
-              <Picker.Item label="Arkansas" value="AR" color="#333" />
-              <Picker.Item label="California" value="CA" color="#333" />
-              <Picker.Item label="Colorado" value="CO" color="#333" />
-              <Picker.Item label="Connecticut" value="CT" color="#333" />
-              <Picker.Item label="Delaware" value="DE" color="#333" />
-              <Picker.Item label="Florida" value="FL" color="#333" />
-              <Picker.Item label="Georgia" value="GA" color="#333" />
-              <Picker.Item label="Hawaii" value="HI" color="#333" />
-              <Picker.Item label="Idaho" value="ID" color="#333" />
-              <Picker.Item label="Illinois" value="IL" color="#333" />
-              <Picker.Item label="Indiana" value="IN" color="#333" />
-              <Picker.Item label="Iowa" value="IA" color="#333" />
-              <Picker.Item label="Kansas" value="KS" color="#333" />
-              <Picker.Item label="Kentucky" value="KY" color="#333" />
-              <Picker.Item label="Louisiana" value="LA" color="#333" />
-              <Picker.Item label="Maine" value="ME" color="#333" />
-              <Picker.Item label="Maryland" value="MD" color="#333" />
-              <Picker.Item label="Massachusetts" value="MA" color="#333" />
-              <Picker.Item label="Michigan" value="MI" color="#333" />
-              <Picker.Item label="Minnesota" value="MN" color="#333" />
-              <Picker.Item label="Mississippi" value="MS" color="#333" />
-              <Picker.Item label="Missouri" value="MO" color="#333" />
-              <Picker.Item label="Montana" value="MT" color="#333" />
-              <Picker.Item label="Nebraska" value="NE" color="#333" />
-              <Picker.Item label="Nevada" value="NV" color="#333" />
-              <Picker.Item label="New Hampshire" value="NH" color="#333" />
-              <Picker.Item label="New Jersey" value="NJ" color="#333" />
-              <Picker.Item label="New Mexico" value="NM" color="#333" />
-              <Picker.Item label="New York" value="NY" color="#333" />
-              <Picker.Item label="North Carolina" value="NC" color="#333" />
-              <Picker.Item label="North Dakota" value="ND" color="#333" />
-              <Picker.Item label="Ohio" value="OH" color="#333" />
-              <Picker.Item label="Oklahoma" value="OK" color="#333" />
-              <Picker.Item label="Oregon" value="OR" color="#333" />
-              <Picker.Item label="Pennsylvania" value="PA" color="#333" />
-              <Picker.Item label="Rhode Island" value="RI" color="#333" />
-              <Picker.Item label="South Carolina" value="SC" color="#333" />
-              <Picker.Item label="South Dakota" value="SD" color="#333" />
-              <Picker.Item label="Tennessee" value="TN" color="#333" />
-              <Picker.Item label="Texas" value="TX" color="#333" />
-              <Picker.Item label="Utah" value="UT" color="#333" />
-              <Picker.Item label="Vermont" value="VT" color="#333" />
-              <Picker.Item label="Virginia" value="VA" color="#333" />
-              <Picker.Item label="Washington" value="WA" color="#333" />
-              <Picker.Item label="West Virginia" value="WV" color="#333" />
-              <Picker.Item label="Wisconsin" value="WI" color="#333" />
-              <Picker.Item label="Wyoming" value="WY" color="#333" />
+              <Picker.Item label="State" value="" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Alabama" value="AL" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Alaska" value="AK" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Arizona" value="AZ" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Arkansas" value="AR" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="California" value="CA" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Colorado" value="CO" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Connecticut" value="CT" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Delaware" value="DE" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Florida" value="FL" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Georgia" value="GA" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Hawaii" value="HI" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Idaho" value="ID" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Illinois" value="IL" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Indiana" value="IN" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Iowa" value="IA" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Kansas" value="KS" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Kentucky" value="KY" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Louisiana" value="LA" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Maine" value="ME" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Maryland" value="MD" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Massachusetts" value="MA" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Michigan" value="MI" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Minnesota" value="MN" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Mississippi" value="MS" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Missouri" value="MO" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Montana" value="MT" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Nebraska" value="NE" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Nevada" value="NV" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="New Hampshire" value="NH" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="New Jersey" value="NJ" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="New Mexico" value="NM" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="New York" value="NY" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="North Carolina" value="NC" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="North Dakota" value="ND" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Ohio" value="OH" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Oklahoma" value="OK" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Oregon" value="OR" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Pennsylvania" value="PA" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Rhode Island" value="RI" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="South Carolina" value="SC" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="South Dakota" value="SD" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Tennessee" value="TN" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Texas" value="TX" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Utah" value="UT" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Vermont" value="VT" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Virginia" value="VA" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Washington" value="WA" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="West Virginia" value="WV" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Wisconsin" value="WI" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Wyoming" value="WY" color="#333" fontFamily="Lato_400Regular" />
             </Picker>
           </View>
 
@@ -416,11 +364,11 @@ const [showPassword, setShowPassword] = useState(false);
               dropdownIconColor="#333"
               mode="dropdown"
             >
-              <Picker.Item label="Select a cause" value="" color="#333" />
-              <Picker.Item label="Environment Conservation" value="environment" color="#333" />
-              <Picker.Item label="Animal Welfare" value="animals" color="#333" />
-              <Picker.Item label="Education & Tutoring" value="education" color="#333" />
-              <Picker.Item label="Community Outreach" value="outreach" color="#333" />
+              <Picker.Item label="Select a cause" value="" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Environment Conservation" value="environment" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Animal Welfare" value="animals" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Education & Tutoring" value="education" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Community Outreach" value="outreach" color="#333" fontFamily="Lato_400Regular" />
             </Picker>
           </View>
 
@@ -434,11 +382,11 @@ const [showPassword, setShowPassword] = useState(false);
               dropdownIconColor="#333"
               mode="dropdown"
             >
-              <Picker.Item label="Select a cause" value="" color="#333" />
-              <Picker.Item label="Environment Conservation" value="environment" color="#333" />
-              <Picker.Item label="Animal Welfare" value="animals" color="#333" />
-              <Picker.Item label="Education & Tutoring" value="education" color="#333" />
-              <Picker.Item label="Community Outreach" value="outreach" color="#333" />
+              <Picker.Item label="Select a cause" value="" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Environment Conservation" value="environment" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Animal Welfare" value="animals" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Education & Tutoring" value="education" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Community Outreach" value="outreach" color="#333" fontFamily="Lato_400Regular" />
             </Picker>
           </View>
 
@@ -452,11 +400,11 @@ const [showPassword, setShowPassword] = useState(false);
               dropdownIconColor="#333"
               mode="dropdown"
             >
-              <Picker.Item label="Select a cause" value="" color="#333" />
-              <Picker.Item label="Environment Conservation" value="environment" color="#333" />
-              <Picker.Item label="Animal Welfare" value="animals" color="#333" />
-              <Picker.Item label="Education & Tutoring" value="education" color="#333" />
-              <Picker.Item label="Community Outreach" value="outreach" color="#333" />
+              <Picker.Item label="Select a cause" value="" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Environment Conservation" value="environment" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Animal Welfare" value="animals" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Education & Tutoring" value="education" color="#333" fontFamily="Lato_400Regular" />
+              <Picker.Item label="Community Outreach" value="outreach" color="#333" fontFamily="Lato_400Regular" />
             </Picker>
           </View>
 
@@ -587,9 +535,11 @@ const styles = StyleSheet.create({
     width: '100%',
     color: '#333',
     backgroundColor: 'transparent',
+    fontFamily: 'Lato_400Regular',
   },
   pickerIOS: {
     backgroundColor: 'transparent',
+    fontFamily: 'Lato_400Regular',
   },
   pickerItemIOS: {
     height: 50,
@@ -640,11 +590,14 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   streetAddressContainer: {
-    flex: 3,
+    flex: 1,
+  },
+  cityContainer: {
+    flex: 2,
     marginRight: 10,
   },
   zipCodeContainer: {
-    flex: 2,
+    flex: 1,
   },
   statePickerContainer: {
     marginTop: 10,

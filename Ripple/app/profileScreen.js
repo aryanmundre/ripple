@@ -252,7 +252,6 @@ const styles = StyleSheet.create({
         left: 0,
         width: '100%',
         height: 500, // Adjust to fit your wave size
-       //zIndex: -1, // Ensure it stays behind other content
       },
 
       bottomBackground: {

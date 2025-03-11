@@ -8,6 +8,20 @@
     "slug": "Ripple",
     "assetBundlePatterns": [
       "**/*"
+    ],
+    "fonts": [
+      {
+        "asset": "./assets/fonts/Lato-Regular.ttf",
+        "family": "Lato_400Regular"
+      },
+      {
+        "asset": "./assets/fonts/MuseoModerno-Regular.ttf",
+        "family": "MuseoModerno_400Regular"
+      },
+      {
+        "asset": "./assets/fonts/MuseoModerno-Bold.ttf",
+        "family": "MuseoModerno_700Bold"
+      }
     ]
   }
 }
