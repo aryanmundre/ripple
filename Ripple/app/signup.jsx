@@ -1,5 +1,5 @@
 //Third page
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     SafeAreaView, 
     View, 
@@ -12,14 +12,15 @@ import {
     Keyboard,
     Alert,
     TouchableOpacity,
+    Platform,
 } from 'react-native';
-import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
-import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProgressBar from "../assets/icons/progressBar.svg";  
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";  
+import * as Font from 'expo-font';
+import Icon from "react-native-vector-icons/Feather";
 
 const { width, height } = Dimensions.get('window');
 
@@ -30,11 +31,28 @@ const SignupScreen = () => {
     const [lastName, setLastName] = useState('');
     const [preferredName, setPreferredName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
 
-    let [fontsLoaded] = useFonts({
-        MuseoModerno_400Regular,
-        WorkSans_400Regular,
-    });
+    useEffect(() => {
+        async function loadFonts() {
+            await Font.loadAsync({
+                'MuseoModerno': require('../assets/fonts/MuseoModerno-Regular.ttf'),
+                'WorkSans': require('../assets/fonts/WorkSans-Regular.ttf'),
+            });
+            setFontsLoaded(true);
+        }
+        loadFonts();
+    }, []);
+
+    if (!fontsLoaded) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.content}>
+                    <Text>Loading...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     const handleNext = async () => {
         if (!firstName || !lastName) {
@@ -59,6 +77,13 @@ const SignupScreen = () => {
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <SafeAreaView style={styles.container}>
+                {/* Back Button */}
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => navigation.navigate('Signin')}
+                >
+                    <Icon name="arrow-left" size={24} color="white" />
+                </TouchableOpacity>
                 <View style={styles.content}>
                     <Logo width={60} height={60} style={styles.logo}/>
                     <Text style={styles.title}>Get Started</Text>
@@ -67,7 +92,9 @@ const SignupScreen = () => {
                         <ProgressBar width={274} height={10} />
                     </View>
 
+                    <View style={{ width: '90%', alignSelf: 'center' }}>
                     <Text style={styles.subtitle}>Tell us your name</Text>
+                    </View>
 
                     <View style={styles.inputContainer}>
                         <View style={styles.inputWrapper}>
@@ -77,7 +104,6 @@ const SignupScreen = () => {
                                 placeholderTextColor="#A9A9A9"
                                 value={firstName}
                                 onChangeText={setFirstName}
-                                testID="firstName-input"
                             />
                         </View>
                         
@@ -88,18 +114,16 @@ const SignupScreen = () => {
                                 placeholderTextColor="#A9A9A9"
                                 value={lastName}
                                 onChangeText={setLastName}
-                                testID="lastName-input"
                             />
                         </View>
 
                         <View style={styles.inputWrapper}>
                             <TextInput
                                 style={styles.input}
-                                placeholder="Preferred Name (Optional)"
+                                placeholder="Preferred Name"
                                 placeholderTextColor="#A9A9A9"
                                 value={preferredName}
                                 onChangeText={setPreferredName}
-                                testID="preferredName-input"
                             />
                         </View>
                     </View>
@@ -110,7 +134,6 @@ const SignupScreen = () => {
                             {opacity: pressed ? 0.7 : 1}
                         ]}
                         onPress={handleNext}
-                        testID="next-button"
                     >
                         <Text style={styles.nextButtonText}>Next</Text>
                     </Pressable>
@@ -147,7 +170,7 @@ const styles = StyleSheet.create({
     title: {
         color: 'white',
         fontSize: 36,
-        fontFamily: 'MuseoModerno_400Regular',
+        fontFamily: 'MuseoModerno',
         marginBottom: 20,
     },
     progressBarContainer: {
@@ -158,9 +181,12 @@ const styles = StyleSheet.create({
     subtitle: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         marginBottom: 20,
+        alignSelf: 'flex-start',  
+        paddingHorizontal: '5%',  
     },
+    
     inputContainer: {
         width: '100%',
         paddingHorizontal: 20,
@@ -176,7 +202,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 25,
         paddingHorizontal: 20,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         fontSize: 16,
     },
     nextButton: {
@@ -190,7 +216,7 @@ const styles = StyleSheet.create({
     nextButtonText: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
     },
     waveContainer: {
         position: "absolute",
@@ -212,6 +238,13 @@ const styles = StyleSheet.create({
         right: 0,
         zIndex: 0,
         pointerEvents: 'none',
+    },
+    backButton: {
+        position: 'absolute',
+        top: Platform.OS === 'ios' ? '8%' : 50, // Scales with screen height on iOS
+        left: '5%', // Scales with screen width
+        padding: 10, // Larger touch target
+        zIndex: 10,
     },
 });
 

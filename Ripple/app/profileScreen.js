@@ -4,10 +4,11 @@ import { FontAwesome } from '@expo/vector-icons';
 import { COLORS } from '../constants';
 import Waves3 from '../assets/icons/Waves3.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { verticalScale, scale, moderateScale } from '../utils/scaling';
 import { useFonts, MuseoModerno_700Bold, } from '@expo-google-fonts/museomoderno';
 
 const { width, height } = Dimensions.get('window');
+const isLargeDevice = height > 850; // iPhone 14 Plus/16 Plus threshold
 
 // Sample Activity Data
 const activities = [
@@ -100,9 +101,8 @@ const ProfileScreen = ({ navigation }) => {
                     <FontAwesome name="user-plus" size={16} color="white" />
                     <Text style={styles.buttonText}>Add Friends</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                    style={styles.editButton}
-                    onPress={() => navigation.navigate('ProfileSettings')}
+                <TouchableOpacity style={styles.editButton}
+                  onPress={() => navigation.navigate('ProfileSettings')}
                 > 
                     <FontAwesome name="pencil" size={16} color="white" />
                     <Text style={styles.buttonText}>Edit</Text>
@@ -133,29 +133,28 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'transparent',
-        padding: 20,
+        padding: scale(20),
     },
     header: {
         alignItems: 'center',
-        marginBottom: 20,
-        paddingTop: 50,
-        zIndex: 2, //Brings profile section in front of the wave
+        marginBottom: verticalScale(20),
+        paddingTop: isLargeDevice ? verticalScale(40) : verticalScale(50),
+        zIndex: 2,
     },
-
     profileImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        marginBottom: 3,
-        marginTop: 25,
-      },
+        width: isLargeDevice ? scale(75) : scale(85),
+        height: isLargeDevice ? scale(75) : scale(85),
+        borderRadius: isLargeDevice ? scale(37.5) : scale(42.5),
+        marginBottom: verticalScale(3),
+        marginTop: verticalScale(25),
+    },
     name: {
-        fontSize: 22,
+        fontSize: isLargeDevice ? moderateScale(20) : moderateScale(22),
         fontFamily: 'MuseoModerno_700Bold',
         color: '#FFF'
     },
     location: {
-        fontSize: 14,
+        fontSize: moderateScale(14),
         fontFamily: 'WorkSans-Regular',
         color: '#FFF',
     },
@@ -163,107 +162,104 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         backgroundColor: 'white',
-        borderRadius: 10,
-        padding: 15,
-        marginBottom: 20,
-        //marginTop: 23,
+        borderRadius: moderateScale(10),
+        padding: scale(15),
+        marginBottom: verticalScale(20),
     },
     statBox: {
         alignItems: 'center',
         flex: 1,
     },
     statNumber: {
-        fontSize: 20,
+        fontSize: moderateScale(20),
         fontFamily: 'WorkSans-Regular',
         color: COLORS.primary,
     },
     statLabel: {
-        fontSize: 12,
+        fontSize: moderateScale(12),
         fontFamily: 'WorkSans-Regular',
         color: '#666',
     },
     buttonsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 20,
+        marginBottom: verticalScale(20),
     },
     button: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#7CBEEA',
-        padding: 10,
-        borderRadius: 8,
+        padding: scale(10),
+        borderRadius: moderateScale(8),
         flex: 1,
-        marginRight: 5,
+        marginRight: scale(5),
         justifyContent: 'center',
+        height: verticalScale(40),
     },
     editButton: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#7CBEEA',
-        padding: 10,
-        borderRadius: 8,
+        padding: scale(10),
+        borderRadius: moderateScale(8),
         flex: 1,
-        marginLeft: 5,
+        marginLeft: scale(5),
         justifyContent: 'center',
+        height: verticalScale(40),
     },
     buttonText: {
         color: '#0D408A',
-        fontSize: 14,
+        fontSize: moderateScale(14),
         fontFamily: 'WorkSans-Regular',
-        marginLeft: 5,
+        marginLeft: scale(5),
     },
     sectionTitle: {
-        fontSize: 18,
+        fontSize: moderateScale(18),
         fontFamily: 'WorkSans-Regular',
-        marginBottom: 10,
+        marginBottom: verticalScale(10),
         color: '#FFF'
     },
     activityCard: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: 'white',
-        borderRadius: 10,
-        padding: 15,
-        marginBottom: 10,
+        borderRadius: moderateScale(10),
+        padding: scale(15),
+        marginBottom: verticalScale(10),
         justifyContent: 'space-between',
     },
     activityDetails: {
         flex: 1,
-        marginLeft: 10,
+        marginLeft: scale(10),
     },
     activityTitle: {
-        fontSize: 16,
+        fontSize: moderateScale(16),
         fontFamily: 'WorkSans-Regular',
     },
     activityDate: {
-        fontSize: 14,
+        fontSize: moderateScale(14),
         fontFamily: 'WorkSans-Regular',
         color: '#666',
     },
     xpTag: {
-        fontSize: 14,
+        fontSize: moderateScale(14),
         fontFamily: 'WorkSans-Regular',
         color: COLORS.primary,
     },
-
     waveContainer: {
         position: 'absolute',
-        top: 0,
+        top: verticalScale(5),
         left: 0,
         width: '100%',
-        height: 500, // Adjust to fit your wave size
-      },
-
-      bottomBackground: {
+        height: isLargeDevice ? verticalScale(450) : verticalScale(500),
+    },
+    bottomBackground: {
         position: 'absolute',
         bottom: 0,
         width: '140%',
         height: '70%', // Covers only lower half
         backgroundColor: '#0D408A', 
-        //zIndex: -2, 
-      }
-
+    }
 });
 
 export default ProfileScreen;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     SafeAreaView, 
     View, 
@@ -7,33 +7,53 @@ import {
     Dimensions,
     Pressable,
     TouchableOpacity,
+    ScrollView,
+    Platform,
+    Alert,
 } from 'react-native';
-import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
-import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
 import { useNavigation } from "@react-navigation/native";
+import * as Font from 'expo-font';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_ENDPOINTS } from "../constants/api";
 import ProgressBar from "../assets/icons/progressBar5.svg";  
 import Logo from "../assets/icons/logo.svg"; 
-import SvgWave from "../assets/icons/Wave.svg";  
+import SvgWave from "../assets/icons/Wave.svg";
+import CheckBox from "../assets/icons/checkbox.svg";
+import CheckBoxSelected from "../assets/icons/checkbox-selected.svg";
+import Icon from "react-native-vector-icons/Feather";
 
 const { width, height } = Dimensions.get('window');
 
 const skills = [
-    { id: 1, title: "Teaching & Mentoring", emoji: "📚" },
-    { id: 2, title: "Event Planning", emoji: "📅" },
-    { id: 3, title: "Social Media", emoji: "📱" },
-    { id: 4, title: "Writing & Editing", emoji: "✍️" },
-    { id: 5, title: "Photography", emoji: "📸" },
-    { id: 6, title: "Web Development", emoji: "💻" },
-    { id: 7, title: "Graphic Design", emoji: "🎨" },
-    { id: 8, title: "Public Speaking", emoji: "🎤" },
+    { id: 1, title: "Teaching & Tutoring" },
+    { id: 2, title: "Medical & First Aid" },
+    { id: 3, title: "Public Speaking & Advocacy" },
+    { id: 4, title: "Legal Assistance" },
+    { id: 5, title: "I'm just here to serve kindness!" },
 ];
 
-const SkillSelection = () => {
+export default function SkillSelection() {
     const navigation = useNavigation();
     const [selectedSkills, setSelectedSkills] = useState([]);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
     
+    useEffect(() => {
+        async function loadFonts() {
+            await Font.loadAsync({
+                'MuseoModerno': require('../assets/fonts/MuseoModerno-Regular.ttf'),
+                'WorkSans': require('../assets/fonts/WorkSans-Regular.ttf'),
+            });
+            setFontsLoaded(true);
+        }
+        loadFonts();
+    }, []);
+
     const handleNext = () => {
-        navigation.navigate('Main');
+        if (selectedSkills.length === 0) {
+            Alert.alert('Error', 'Please select at least one skill');
+            return;
+        }
+        navigation.navigate('VolunteerPreferences');
     };
 
     const toggleSkill = (skillId) => {
@@ -48,17 +68,27 @@ const SkillSelection = () => {
         });
     };
 
-    let [fontsLoaded] = useFonts({
-        MuseoModerno_400Regular,
-        WorkSans_400Regular,
-    });
-
     if (!fontsLoaded) {
-        return null;
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.content}>
+                    <Text>Loading...</Text>
+                </View>
+            </SafeAreaView>
+        );
     }
 
     return (
         <SafeAreaView style={styles.container}>
+            {/* Back Button */}
+            <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => navigation.navigate('CauseSelection')}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                activeOpacity={0.7}
+            >
+                <Icon name="arrow-left" size={24} color="white" />
+            </TouchableOpacity>
             <View style={styles.content}>
                 <Logo width={55} height={55} style={styles.logo}/>
                 <Text style={styles.title}>Get Started</Text>
@@ -68,22 +98,21 @@ const SkillSelection = () => {
                 </View>
 
                 <View style={styles.inputContainer}>
-                    <Text style={styles.subtitle}>What skills can you contribute?</Text>
+                    <Text style={styles.subtitle}>Do you have any special skills or experience you'd like to offer?</Text>
                     <Text style={styles.subHeader}>Choose your top 3</Text>
 
-                    <View style={styles.skillsGrid}>
+                    <View style={styles.skillsContainer}>
                         {skills.map((skill) => (
                             <TouchableOpacity
                                 key={skill.id}
                                 style={styles.skillItem}
                                 onPress={() => toggleSkill(skill.id)}
                             >
-                                <View style={[
-                                    styles.skillButton,
-                                    selectedSkills.includes(skill.id) && styles.selectedSkill
-                                ]}>
-                                    <Text style={styles.skillText}>{skill.emoji} {skill.title}</Text>
-                                </View>
+                                {selectedSkills.includes(skill.id) ? 
+                                    <CheckBoxSelected width={24} height={24} style={styles.checkbox} /> :
+                                    <CheckBox width={24} height={24} style={styles.checkbox} />
+                                }
+                                <Text style={styles.skillText}>{skill.title}</Text>
                             </TouchableOpacity>
                         ))}
                     </View>
@@ -110,7 +139,7 @@ const SkillSelection = () => {
             <View style={styles.bottomWhiteBackground} />
         </SafeAreaView>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -120,7 +149,7 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         alignItems: 'center',
-        paddingHorizontal: 10,
+        paddingHorizontal: 20,
         zIndex: 2,
     },
     logo: {
@@ -130,7 +159,7 @@ const styles = StyleSheet.create({
     title: {
         color: 'white',
         fontSize: 32,
-        fontFamily: 'MuseoModerno_400Regular',
+        fontFamily: 'MuseoModerno',
         marginBottom: 15,
     },
     progressBarContainer: {
@@ -141,64 +170,45 @@ const styles = StyleSheet.create({
     subtitle: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         marginBottom: 6,
         textAlign: 'center',
     },
     subHeader: {
         color: 'white',
         fontSize: 12,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         marginBottom: 20,
         opacity: 0.8,
         textAlign: 'center',
         fontStyle: 'italic',
     },
     inputContainer: {
-        width: '80%',
+        width: '90%',
         paddingBottom: 0,
         marginBottom: 0,
-        maxHeight: '40%',
+        maxHeight: '45%',
     },
-    skillsGrid: {
+    skillsContainer: {
         width: '100%',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-        alignContent: 'flex-start',
-        gap: 11,
-        marginTop: 0,
+        gap: 12,
     },
     skillItem: {
-        width: '45%',
-        aspectRatio: 0.9,
-        backgroundColor: 'white',
-        borderRadius: 12,
-        position: 'relative',
+        width: '100%',
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
+        backgroundColor: 'white',
+        borderRadius: 30,
+        padding: 12,
         marginBottom: 0,
     },
-    skillButton: {
-        position: 'absolute',
-        bottom: 10,
-        width: '90%',
-        alignSelf: 'center',
-        backgroundColor: '#666666',
-        borderRadius: 25,
-        paddingVertical: 3,
-        paddingHorizontal: 6,
-        height: 20,
-        justifyContent: 'center',
-    },
-    selectedSkill: {
-        backgroundColor: '#5AA8DC',
+    checkbox: {
+        marginRight: 12,
     },
     skillText: {
-        color: 'white',
-        fontSize: 11,
-        fontFamily: 'WorkSans_400Regular',
-        textAlign: 'center',
+        color: '#333333',
+        fontSize: 14,
+        fontFamily: 'WorkSans',
     },
     nextButton: {
         backgroundColor: '#5AA8DC',
@@ -206,13 +216,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 40,
         borderRadius: 30,
         position: 'absolute',
-        top: '72%',
+        top: '80%',
         zIndex: 3,
     },
     nextButtonText: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
     },
     waveContainer: {
         position: "absolute",
@@ -235,6 +245,12 @@ const styles = StyleSheet.create({
         zIndex: 0,
         pointerEvents: 'none',
     },
-});
-
-export default SkillSelection; 
+    backButton: {
+        position: 'absolute',
+        top: Platform.OS === 'ios' ? '8%' : 50,
+        left: '5%',
+        padding: 10,
+        zIndex: 10,
+        backgroundColor: 'transparent',
+    },
+}); 

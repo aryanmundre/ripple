@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     SafeAreaView, 
     View, 
@@ -11,9 +11,8 @@ import {
     TouchableWithoutFeedback,
     Keyboard,
     Alert,
+    Platform,
 } from 'react-native';
-import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
-import { WorkSans_400Regular, WorkSans_600SemiBold, WorkSans_700Bold } from '@expo-google-fonts/work-sans';
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_ENDPOINTS, handleApiError } from "../constants/api";
@@ -21,6 +20,7 @@ import ProgressBar from "../assets/icons/progressBar3.svg";
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";  
 import Icon from "react-native-vector-icons/Feather";
+import * as Font from 'expo-font';
 
 const { width, height } = Dimensions.get('window');
 
@@ -32,6 +32,30 @@ const LocationSetup = () => {
     const [state, setState] = useState('');
     const [zipCode, setZipCode] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
+
+    useEffect(() => {
+        async function loadFonts() {
+            await Font.loadAsync({
+                'MuseoModerno': require('../assets/fonts/MuseoModerno-Regular.ttf'),
+                'WorkSans': require('../assets/fonts/WorkSans-Regular.ttf'),
+                'WorkSans-SemiBold': require('../assets/fonts/WorkSans-SemiBold.ttf'),
+                'WorkSans-Bold': require('../assets/fonts/WorkSans-Bold.ttf'),
+            });
+            setFontsLoaded(true);
+        }
+        loadFonts();
+    }, []);
+
+    if (!fontsLoaded) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.content}>
+                    <Text>Loading...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     const handleNext = async () => {
         if (!streetAddress || !city || !state || !zipCode) {
@@ -67,12 +91,12 @@ const LocationSetup = () => {
                 email: signupData.email,
                 password: signupData.password,
                 date_of_birth: signupData.dateOfBirth,
-                street_address: streetAddress.trim(),
-                city: city.trim(),
-                state: state.trim(),
-                zip_code: zipCode.trim(),
-                interests: signupData.interests || {},
-                preferred_time_commitment: signupData.preferredTimeCommitment || null
+                address: {
+                    street: streetAddress,
+                    city,
+                    state,
+                    zip_code: zipCode
+                }
             };
 
             console.log('Registration Data:', JSON.stringify(registrationData, null, 2));
@@ -119,16 +143,18 @@ const LocationSetup = () => {
         }
     };
 
-    let [fontsLoaded] = useFonts({
-        MuseoModerno_400Regular,
-        WorkSans_400Regular,
-        WorkSans_600SemiBold,
-        WorkSans_700Bold,
-    });
-
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <SafeAreaView style={styles.container}>
+                {/* Back Button */}
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => navigation.navigate('AccountSetup')}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    activeOpacity={0.7}
+                >
+                    <Icon name="arrow-left" size={24} color="white" />
+                </TouchableOpacity>
                 <View style={styles.content}>
                     <Logo width={60} height={60} style={styles.logo}/>
                     <Text style={styles.title}>Get Started</Text>
@@ -226,7 +252,7 @@ const styles = StyleSheet.create({
     title: {
         color: 'white',
         fontSize: 36,
-        fontFamily: 'MuseoModerno_400Regular',
+        fontFamily: 'MuseoModerno',
         marginBottom: 20,
     },
     progressBarContainer: {
@@ -237,7 +263,7 @@ const styles = StyleSheet.create({
     subtitle: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         marginBottom: 20,
         alignSelf: 'flex-start',
     },
@@ -256,7 +282,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 25,
         paddingHorizontal: 20,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         fontSize: 16,
     },
     rowContainer: {
@@ -290,7 +316,7 @@ const styles = StyleSheet.create({
     nextButtonText: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
     },
     waveContainer: {
         position: "absolute",
@@ -312,6 +338,14 @@ const styles = StyleSheet.create({
         right: 0,
         zIndex: 0,
         pointerEvents: 'none',
+    },
+    backButton: {
+        position: 'absolute',
+        top: Platform.OS === 'ios' ? '8%' : 50,
+        left: '5%',
+        padding: 10,
+        zIndex: 10,
+        backgroundColor: 'transparent',
     },
 });
 

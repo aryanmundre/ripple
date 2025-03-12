@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     SafeAreaView, 
     View, 
@@ -7,16 +7,19 @@ import {
     Dimensions,
     Pressable,
     TouchableOpacity,
+    ScrollView,
+    Platform,
     Alert,
 } from 'react-native';
-import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
-import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
 import { useNavigation } from "@react-navigation/native";
+import * as Font from 'expo-font';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_ENDPOINTS } from "../constants/api";
 import ProgressBar from "../assets/icons/progressBar4.svg";  
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";  
 import ImagePlaceholder from "../assets/icons/imageplaceholder.svg";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from "react-native-vector-icons/Feather";
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,39 +32,28 @@ const causes = [
     { id: 6, title: "Food security & Hunger relief", emoji: "🍽️" },
 ];
 
-const CauseSelection = () => {
+export default function CauseSelection() {
     const navigation = useNavigation();
     const [selectedCauses, setSelectedCauses] = useState([]);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
     
-    const handleNext = async () => {
-        try {
-            // Convert selected causes to interests object
-            const interestsObject = causes.reduce((acc, cause) => {
-                acc[cause.title.toLowerCase().replace(/\s+/g, '_')] = selectedCauses.includes(cause.id);
-                return acc;
-            }, {});
-
-            // Get existing signup data
-            const existingData = await AsyncStorage.getItem('signupData');
-            const signupData = JSON.parse(existingData || '{}');
-            
-            // Add interests to signup data
-            const updatedData = {
-                ...signupData,
-                interests: interestsObject,
-                // Default to 60 minutes if not set
-                preferredTimeCommitment: signupData.preferredTimeCommitment || 60
-            };
-            
-            // Save updated data
-            await AsyncStorage.setItem('signupData', JSON.stringify(updatedData));
-            
-            // Navigate to next screen
-            navigation.navigate('SkillSelection');
-        } catch (error) {
-            console.error('Error saving cause selection:', error);
-            Alert.alert('Error', 'Could not save your cause selections. Please try again.');
+    useEffect(() => {
+        async function loadFonts() {
+            await Font.loadAsync({
+                'MuseoModerno': require('../assets/fonts/MuseoModerno-Regular.ttf'),
+                'WorkSans': require('../assets/fonts/WorkSans-Regular.ttf'),
+            });
+            setFontsLoaded(true);
         }
+        loadFonts();
+    }, []);
+
+    const handleNext = () => {
+        if (selectedCauses.length === 0) {
+            Alert.alert('Error', 'Please select at least one cause');
+            return;
+        }
+        navigation.navigate('SkillSelection');
     };
 
     const toggleCause = (causeId) => {
@@ -76,13 +68,14 @@ const CauseSelection = () => {
         });
     };
 
-    let [fontsLoaded] = useFonts({
-        MuseoModerno_400Regular,
-        WorkSans_400Regular,
-    });
-
     if (!fontsLoaded) {
-        return null;
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.content}>
+                    <Text>Loading...</Text>
+                </View>
+            </SafeAreaView>
+        );
     }
 
     return (
@@ -143,7 +136,7 @@ const CauseSelection = () => {
             <View style={styles.bottomWhiteBackground} />
         </SafeAreaView>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -163,7 +156,7 @@ const styles = StyleSheet.create({
     title: {
         color: 'white',
         fontSize: 32,
-        fontFamily: 'MuseoModerno_400Regular',
+        fontFamily: 'MuseoModerno',
         marginBottom: 15,
     },
     progressBarContainer: {
@@ -174,14 +167,14 @@ const styles = StyleSheet.create({
     subtitle: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         marginBottom: 6,
         textAlign: 'center',
     },
     subHeader: {
         color: 'white',
         fontSize: 12,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         marginBottom: 20,
         opacity: 0.8,
         textAlign: 'center',
@@ -230,7 +223,7 @@ const styles = StyleSheet.create({
     causeText: {
         color: 'white',
         fontSize: 11,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         textAlign: 'center',
     },
     nextButton: {
@@ -245,7 +238,7 @@ const styles = StyleSheet.create({
     nextButtonText: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
     },
     waveContainer: {
         position: "absolute",
@@ -268,6 +261,4 @@ const styles = StyleSheet.create({
         zIndex: 0,
         pointerEvents: 'none',
     },
-});
-
-export default CauseSelection; 
+}); 

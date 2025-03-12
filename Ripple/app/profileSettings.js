@@ -12,6 +12,7 @@ import {
 } from '@expo-google-fonts/lato';
 import * as Font from 'expo-font';
 import { FontAwesome } from '@expo/vector-icons';
+import { verticalScale, scale, moderateScale } from '../utils/scaling';
 
 import {
   View,
@@ -29,7 +30,8 @@ import Waves2 from '../assets/icons/Waves2.svg';
 import BackArrow from '../assets/icons/BackArrow.svg'; 
 import { COLORS } from '../constants'; 
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+const isLargeDevice = height > 850; // iPhone 14 Plus/16 Plus threshold
 
 const ProfileSettings = ({ navigation }) => {
 const [fontsLoaded] = useFonts({
@@ -152,7 +154,7 @@ const [city, setCity] = useState('');
     >
       {/* Animated Header */}
       <Animated.View style={[styles.header, { opacity: headerOpacity }]}>
-        <TouchableOpacity 
+      <TouchableOpacity 
           onPress={() => navigation.goBack()}
           style={styles.backButton}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -191,49 +193,49 @@ const [city, setCity] = useState('');
           <View style={styles.formContainer}>
           <Text style={styles.label}>Name</Text>
           <View style={styles.inputContainer}>
-            <TextInput 
-              style={styles.textInput} 
-              value={name} 
-              onChangeText={setName} 
-              placeholder="Enter your name"
+          <TextInput 
+            style={styles.textInput} 
+            value={name} 
+            onChangeText={setName} 
+            placeholder="Enter your name"
               placeholderTextColor="#A9A9A9"
-            />
+          />
             <FontAwesome name="pencil" size={16} color="#A9A9A9" style={styles.editIcon} />
           </View>
 
           <Text style={styles.label}>Preferred Name</Text>
           <View style={styles.inputContainer}>
-            <TextInput 
-              style={styles.textInput} 
-              value={preferredName} 
-              onChangeText={setPreferredName} 
-              placeholder="Enter your preferred name"
+          <TextInput 
+            style={styles.textInput} 
+            value={preferredName} 
+            onChangeText={setPreferredName} 
+            placeholder="Enter your preferred name"
               placeholderTextColor="#A9A9A9"
-            />
+          />
             <FontAwesome name="pencil" size={16} color="#A9A9A9" style={styles.editIcon} />
           </View>
 
           <Text style={styles.label}>Email Address</Text>
           <View style={styles.inputContainer}>
-            <TextInput 
-              style={styles.textInput} 
-              value={email} 
-              onChangeText={setEmail} 
-              placeholder="Enter your email"
-              keyboardType="email-address"
+          <TextInput 
+            style={styles.textInput} 
+            value={email} 
+            onChangeText={setEmail} 
+            placeholder="Enter your email"
+            keyboardType="email-address"
               autoCapitalize="none"
               placeholderTextColor="#A9A9A9"
-            />
+          />
             <FontAwesome name="pencil" size={16} color="#A9A9A9" style={styles.editIcon} />
           </View>
 
           <Text style={styles.label}>Password</Text>
           <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.textInput}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Enter your password"
+          <TextInput
+          style={styles.textInput}
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Enter your password"
               secureTextEntry={!showPassword}
               autoCapitalize="none"
               autoCorrect={false}
@@ -253,7 +255,7 @@ const [city, setCity] = useState('');
           <View style={styles.locationRowContainer}>
             <View style={[styles.inputContainer, styles.streetAddressContainer]}>
               <TextInput 
-                style={styles.textInput}
+            style={styles.textInput} 
                 value={streetAddress}
                 onChangeText={setStreetAddress}
                 placeholder="Street Address"
@@ -437,9 +439,9 @@ const styles = StyleSheet.create({
   },
   header: {
     position: 'absolute',
-    top: 60,
-    left: 20,
-    right: 20,
+    top: isLargeDevice ? verticalScale(45) : verticalScale(60),
+    left: scale(20),
+    right: scale(20),
     alignItems: 'center',
     zIndex: 100,
     backgroundColor: 'transparent',
@@ -457,11 +459,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   formContainer: {
-    padding: 20,
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
+    padding: scale(20),
+    backgroundColor: '#FFFFFF', 
+    borderTopLeftRadius: moderateScale(40),
+    borderTopRightRadius: moderateScale(40),
     zIndex: 1,
+    marginTop: isLargeDevice ? 0 : verticalScale(5),
   },
   label: {
     marginTop: 15,
@@ -471,10 +474,10 @@ const styles = StyleSheet.create({
   },
   waveContainer: {
     position: 'absolute',
-    top: 5,
+    top: verticalScale(5),
     left: 0,
     width: '100%',
-    height: 500,
+    height: isLargeDevice ? verticalScale(450) : verticalScale(500),
   },
   scrollContainer: {
     flexGrow: 1,
@@ -482,18 +485,18 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     alignItems: 'center',
-    paddingTop: 110,
-    paddingBottom: 20,
-    backgroundColor: 'transparent',
+    paddingTop: isLargeDevice ? verticalScale(90) : verticalScale(110),
+    paddingBottom: verticalScale(10),
+    backgroundColor: 'transparent', 
   },
   profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 10,
+    width: isLargeDevice ? scale(75) : scale(85),
+    height: isLargeDevice ? scale(75) : scale(85),
+    borderRadius: isLargeDevice ? scale(37.5) : scale(42.5),
+    marginBottom: verticalScale(10),
   },
   name: {
-    fontSize: 22,
+    fontSize: isLargeDevice ? moderateScale(20) : moderateScale(22),
     color: '#fff',
     fontFamily: 'Lato_400Regular',
   },

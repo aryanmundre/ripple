@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     SafeAreaView, 
     View, 
@@ -8,35 +8,46 @@ import {
     Pressable,
     TouchableOpacity,
     Modal,
+    ScrollView,
+    Platform,
+    Alert,
 } from 'react-native';
-import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
-import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
+import * as Font from 'expo-font';
 import { useNavigation } from "@react-navigation/native";
 import ProgressBar from "../assets/icons/progressBar6.svg";  
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";
 import { Picker } from '@react-native-picker/picker';
+import Icon from "react-native-vector-icons/Feather";
 
 const { width, height } = Dimensions.get('window');
 
 const frequencyOptions = [
-    "Weekly",
-    "Monthly",
-    "Quarterly",
+    "Once a week",
+    "2-3 times a week",
+    "Once a month",
+    "2-3 times a month",
+    "Weekends only",
+    "Weekdays only",
+    "Flexible schedule",
     "As needed"
 ];
 
 const virtualOptions = [
-    "Yes, I'm interested",
-    "No, in-person only",
-    "Either is fine"
+    "Yes, I prefer virtual volunteering",
+    "Yes, but I also like in-person",
+    "No, I prefer in-person only",
+    "No preference"
 ];
 
 const ageGroupOptions = [
     "Children (0-12)",
     "Teenagers (13-19)",
-    "Adults (20-64)",
+    "Young Adults (20-29)",
+    "Adults (30-64)",
     "Seniors (65+)",
+    "Special Needs Groups",
+    "All age groups",
     "No preference"
 ];
 
@@ -48,8 +59,14 @@ const VolunteerPreferences = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [currentPicker, setCurrentPicker] = useState('');
     const [tempSelection, setTempSelection] = useState('');
+    const [selectedPreferences, setSelectedPreferences] = useState([]);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
     
     const handleNext = () => {
+        if (!frequency || !virtualPreference || !ageGroup) {
+            Alert.alert('Error', 'Please select all preferences');
+            return;
+        }
         navigation.reset({
             index: 0,
             routes: [{ name: 'Main' }],
@@ -87,13 +104,25 @@ const VolunteerPreferences = () => {
         setModalVisible(false);
     };
 
-    let [fontsLoaded] = useFonts({
-        MuseoModerno_400Regular,
-        WorkSans_400Regular,
-    });
+    useEffect(() => {
+        async function loadFonts() {
+            await Font.loadAsync({
+                'MuseoModerno': require('../assets/fonts/MuseoModerno-Regular.ttf'),
+                'WorkSans': require('../assets/fonts/WorkSans-Regular.ttf'),
+            });
+            setFontsLoaded(true);
+        }
+        loadFonts();
+    }, []);
 
     if (!fontsLoaded) {
-        return null;
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.content}>
+                    <Text>Loading...</Text>
+                </View>
+            </SafeAreaView>
+        );
     }
 
     const getPickerOptions = () => {
@@ -111,6 +140,15 @@ const VolunteerPreferences = () => {
 
     return (
         <SafeAreaView style={styles.container}>
+            {/* Back Button */}
+            <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => navigation.navigate('SkillSelection')}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                activeOpacity={0.7}
+            >
+                <Icon name="arrow-left" size={24} color="white" />
+            </TouchableOpacity>
             <View style={styles.content}>
                 <Logo width={55} height={55} style={styles.logo}/>
                 <Text style={styles.title}>Get Started</Text>
@@ -210,25 +248,25 @@ const VolunteerPreferences = () => {
                                 <Text style={[styles.modalButtonText, styles.confirmButton]}>Confirm</Text>
                             </TouchableOpacity>
                         </View>
-                        <Picker
-                            selectedValue={tempSelection}
-                            onValueChange={(itemValue) => setTempSelection(itemValue)}
-                            style={styles.picker}
-                        >
-                            <Picker.Item 
-                                label="Select an option" 
-                                value="" 
-                                style={styles.pickerPlaceholder}
-                            />
+                        <ScrollView style={styles.optionsContainer}>
                             {getPickerOptions().map((option) => (
-                                <Picker.Item 
-                                    key={option} 
-                                    label={option} 
-                                    value={option}
-                                    style={styles.pickerItem}
-                                />
+                                <TouchableOpacity
+                                    key={option}
+                                    style={[
+                                        styles.optionItem,
+                                        tempSelection === option && styles.selectedOption
+                                    ]}
+                                    onPress={() => setTempSelection(option)}
+                                >
+                                    <Text style={[
+                                        styles.optionText,
+                                        tempSelection === option && styles.selectedOptionText
+                                    ]}>
+                                        {option}
+                                    </Text>
+                                </TouchableOpacity>
                             ))}
-                        </Picker>
+                        </ScrollView>
                     </View>
                 </View>
             </Modal>
@@ -254,7 +292,7 @@ const styles = StyleSheet.create({
     title: {
         color: 'white',
         fontSize: 32,
-        fontFamily: 'MuseoModerno_400Regular',
+        fontFamily: 'MuseoModerno',
         marginBottom: 15,
     },
     progressBarContainer: {
@@ -265,7 +303,7 @@ const styles = StyleSheet.create({
     subtitle: {
         color: 'white',
         fontSize: 24,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         marginBottom: 30,
         textAlign: 'center',
     },
@@ -281,7 +319,7 @@ const styles = StyleSheet.create({
     questionText: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         marginBottom: 10,
     },
     selectButton: {
@@ -293,7 +331,7 @@ const styles = StyleSheet.create({
     selectButtonText: {
         color: '#666666',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         textAlign: 'left',
     },
     selectedText: {
@@ -311,7 +349,7 @@ const styles = StyleSheet.create({
     nextButtonText: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
     },
     waveContainer: {
         position: "absolute",
@@ -343,7 +381,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        paddingBottom: 20,
+        paddingBottom: Platform.OS === 'ios' ? 40 : 20,
+        maxHeight: '70%',
     },
     modalHeader: {
         flexDirection: 'row',
@@ -358,23 +397,41 @@ const styles = StyleSheet.create({
     modalButtonText: {
         fontSize: 16,
         color: '#007AFF',
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
     },
     confirmButton: {
         fontWeight: '600',
     },
-    picker: {
-        width: '100%',
+    optionsContainer: {
+        paddingHorizontal: 20,
+        paddingTop: 10,
     },
-    pickerItem: {
+    optionItem: {
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        borderRadius: 10,
+        marginVertical: 5,
+        backgroundColor: '#f8f8f8',
+    },
+    selectedOption: {
+        backgroundColor: '#5AA8DC',
+    },
+    optionText: {
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
+        color: '#333333',
     },
-    pickerPlaceholder: {
-        fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
-        color: '#666666',
+    selectedOptionText: {
+        color: 'white',
     },
+    backButton: {
+        position: 'absolute',
+        top: Platform.OS === 'ios' ? '8%' : 50,
+        left: '5%',
+        padding: 10,
+        zIndex: 10,
+        backgroundColor: 'transparent',
+    },  
 });
 
 export default VolunteerPreferences; 

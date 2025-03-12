@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     SafeAreaView, 
     View, 
@@ -15,14 +15,13 @@ import {
     Alert,
 } from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
-import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
-import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProgressBar from "../assets/icons/progressBar2.svg";  
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";  
 import Icon from "react-native-vector-icons/Feather";
+import * as Font from 'expo-font';
 
 const { width, height } = Dimensions.get('window');
 
@@ -34,12 +33,30 @@ const AccountSetup = () => {
     const [showCalendar, setShowCalendar] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
 
-    let [fontsLoaded] = useFonts({
-        MuseoModerno_400Regular,
-        WorkSans_400Regular,
-    });
+    useEffect(() => {
+        async function loadFonts() {
+            await Font.loadAsync({
+                'MuseoModerno': require('../assets/fonts/MuseoModerno-Regular.ttf'),
+                'WorkSans': require('../assets/fonts/WorkSans-Regular.ttf'),
+            });
+            setFontsLoaded(true);
+        }
+        loadFonts();
+    }, []);
+
+    if (!fontsLoaded) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.content}>
+                    <Text>Loading...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     const handleNext = async () => {
         if (!username || !dateOfBirth || !email || !password) {
@@ -80,8 +97,11 @@ const AccountSetup = () => {
     const onDateChange = (date) => {
         if (date) {
             const selectedDate = new Date(date);
-            // Format date as YYYY-MM-DD for backend compatibility
-            const formattedDate = selectedDate.toISOString().split('T')[0];
+            // Format date as YYYY-MM-DD
+            const year = selectedDate.getFullYear();
+            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+            const day = String(selectedDate.getDate()).padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
             setDateOfBirth(formattedDate);
         }
         setShowCalendar(false);
@@ -95,6 +115,13 @@ const AccountSetup = () => {
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <SafeAreaView style={styles.container}>
+                {/* Back Button */}
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => navigation.navigate('Signup')}
+                >
+                    <Icon name="arrow-left" size={24} color="white" />
+                </TouchableOpacity>
                 <View style={styles.content}>
                     <Logo width={60} height={60} style={styles.logo}/>
                     <Text style={styles.title}>Get Started</Text>
@@ -103,7 +130,11 @@ const AccountSetup = () => {
                         <ProgressBar width={274} height={10} />
                     </View>
 
-                    <Text style={styles.subtitle}>Set up your account</Text>
+                    <View style={styles.subtitleContainer}>
+                        <Text style={styles.subtitle}>
+                            Set up your account
+                        </Text>
+                    </View>
 
                     <View style={styles.inputContainer}>
                         <View style={styles.inputWrapper}>
@@ -113,7 +144,6 @@ const AccountSetup = () => {
                                 placeholderTextColor="#A9A9A9"
                                 value={username}
                                 onChangeText={setUsername}
-                                testID="username-input"
                             />
                         </View>
 
@@ -121,7 +151,6 @@ const AccountSetup = () => {
                             <TouchableOpacity 
                                 style={styles.inputWrapper}
                                 onPress={toggleCalendar}
-                                testID="dob-input"
                             >
                                 <TextInput
                                     style={styles.input}
@@ -143,7 +172,7 @@ const AccountSetup = () => {
                                         selectedDayTextColor="#FFFFFF"
                                         width={width * 0.85}
                                         textStyle={{
-                                            fontFamily: 'WorkSans_400Regular',
+                                            fontFamily: 'WorkSans',
                                             color: '#333333',
                                         }}
                                     />
@@ -160,7 +189,6 @@ const AccountSetup = () => {
                                 onChangeText={setEmail}
                                 keyboardType="email-address"
                                 autoCapitalize="none"
-                                testID="email-input"
                             />
                         </View>
 
@@ -171,9 +199,14 @@ const AccountSetup = () => {
                                 placeholderTextColor="#A9A9A9"
                                 value={password}
                                 onChangeText={setPassword}
-                                secureTextEntry
-                                testID="password-input"
+                                secureTextEntry={!showPassword}
                             />
+                            <TouchableOpacity
+                                style={styles.eyeIcon}
+                                onPress={() => setShowPassword(!showPassword)}
+                            >
+                                <Icon name={showPassword ? "eye" : "eye-off"} size={20} color="#A9A9A9" />
+                            </TouchableOpacity>
                         </View>
                     </View>
 
@@ -183,7 +216,6 @@ const AccountSetup = () => {
                             {opacity: pressed ? 0.7 : 1}
                         ]}
                         onPress={handleNext}
-                        testID="next-button"
                     >
                         <Text style={styles.nextButtonText}>Next</Text>
                     </Pressable>
@@ -220,7 +252,7 @@ const styles = StyleSheet.create({
     title: {
         color: 'white',
         fontSize: 36,
-        fontFamily: 'MuseoModerno_400Regular',
+        fontFamily: 'MuseoModerno',
         marginBottom: 20,
     },
     progressBarContainer: {
@@ -228,11 +260,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 30,
     },
+    subtitleContainer: {
+        width: '90%',
+        alignSelf: 'center',
+        paddingHorizontal: '5%',
+        marginTop: Platform.OS === 'ios' ? '2%' : 0, // Adjusts spacing for iOS
+    },
     subtitle: {
         color: 'white',
-        fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
-        marginBottom: 20,
+        fontSize: Platform.OS === 'ios' 
+            ? Math.min(16, Dimensions.get('window').width * 0.04) // Responsive font size
+            : 16,
+        fontFamily: 'WorkSans',
+        marginBottom: Platform.OS === 'ios' 
+            ? Dimensions.get('window').height * 0.025 // Responsive margin
+            : 20,
+        alignSelf: 'flex-start',
     },
     inputContainer: {
         width: '100%',
@@ -249,7 +292,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 25,
         paddingHorizontal: 20,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         fontSize: 16,
     },
     calendarIcon: {
@@ -268,7 +311,7 @@ const styles = StyleSheet.create({
     nextButtonText: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
     },
     waveContainer: {
         position: "absolute",
@@ -313,6 +356,18 @@ const styles = StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 5,
         zIndex: 1000,
+    },
+    eyeIcon: {
+        position: 'absolute',
+        right: 20,
+        top: 15,
+    },
+    backButton: {
+        position: 'absolute',
+        top: Platform.OS === 'ios' ? '8%' : 50, // Scales with screen height on iOS
+        left: '5%', // Scales with screen width
+        padding: 10, // Larger touch target
+        zIndex: 10,
     },
 });
 

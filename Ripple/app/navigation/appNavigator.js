@@ -16,6 +16,7 @@ import AccountSetup from '../AccountSetup';
 import LocationSetup from '../LocationSetup';
 import CauseSelection from '../CauseSelection';
 import SkillSelection from '../SkillSelection';
+import VolunteerPreferences from '../VolunteerPreferences';
 
 import SvgExplore from '../../assets/icons/Compass.svg';
 import SvgHeart from '../../assets/icons/Heart.svg';
@@ -118,6 +119,14 @@ const AuthNavigator = () => {
             <AuthStack.Screen 
                 name="SkillSelection" 
                 component={SkillSelection}
+                options={{
+                    gestureEnabled: true,
+                    animationEnabled: true,
+                }}
+            />
+            <AuthStack.Screen 
+                name="VolunteerPreferences" 
+                component={VolunteerPreferences}
                 options={{
                     gestureEnabled: true,
                     animationEnabled: true,
