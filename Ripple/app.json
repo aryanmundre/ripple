@@ -9,6 +9,11 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "ios": {
+      "supportsTablet": true,
+      "requireFullScreen": true,
+      "bundleIdentifier": "com.ripple.app"
+    },
     "fonts": [
       {
         "asset": "./assets/fonts/Lato-Regular.ttf",

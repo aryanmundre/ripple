@@ -68,13 +68,13 @@ export default function LogInSignUp() {
             </View>
 
            {/* This is Skip Button that navigates to the Profile Page */}
-            {/* <TouchableOpacity
+            <TouchableOpacity
                 style={styles.skipButton}
                 onPress={() => navigation.navigate("AppNavigator", { screen: "Profile" })
                 }
             >
                 <Text style={styles.buttonText}>SKIP</Text>
-                </TouchableOpacity>*/}
+                </TouchableOpacity>
             
             <View style={styles.socialContainer}>
                 <Text style={styles.socialText}>Or Sign In with</Text>

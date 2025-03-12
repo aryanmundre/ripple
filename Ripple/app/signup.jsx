@@ -92,7 +92,6 @@ const GettingStarted = () => {
 
 
             
-
             {/* Background Graphics */}
             <View style={styles.graphics}>
                 {/* Add your SVG graphics here */}
