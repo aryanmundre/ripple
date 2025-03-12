@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     SafeAreaView, 
     View, 
@@ -8,14 +8,16 @@ import {
     Pressable,
     TouchableOpacity,
     Modal,
+    ScrollView,
+    Platform,
 } from 'react-native';
-import { useFonts, MuseoModerno_400Regular } from '@expo-google-fonts/museomoderno';
-import { WorkSans_400Regular } from '@expo-google-fonts/work-sans';
+import * as Font from 'expo-font';
 import { useNavigation } from "@react-navigation/native";
 import ProgressBar from "../assets/icons/progressBar6.svg";  
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";
 import { Picker } from '@react-native-picker/picker';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -48,6 +50,8 @@ const VolunteerPreferences = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [currentPicker, setCurrentPicker] = useState('');
     const [tempSelection, setTempSelection] = useState('');
+    const [selectedPreferences, setSelectedPreferences] = useState([]);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
     
     const handleNext = () => {
         navigation.reset({
@@ -87,13 +91,25 @@ const VolunteerPreferences = () => {
         setModalVisible(false);
     };
 
-    let [fontsLoaded] = useFonts({
-        MuseoModerno_400Regular,
-        WorkSans_400Regular,
-    });
+    useEffect(() => {
+        async function loadFonts() {
+            await Font.loadAsync({
+                'MuseoModerno': require('../assets/fonts/MuseoModerno-Regular.ttf'),
+                'WorkSans': require('../assets/fonts/WorkSans-Regular.ttf'),
+            });
+            setFontsLoaded(true);
+        }
+        loadFonts();
+    }, []);
 
     if (!fontsLoaded) {
-        return null;
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.content}>
+                    <Text>Loading...</Text>
+                </View>
+            </SafeAreaView>
+        );
     }
 
     const getPickerOptions = () => {
@@ -111,6 +127,13 @@ const VolunteerPreferences = () => {
 
     return (
         <SafeAreaView style={styles.container}>
+            {/* Back Button */}
+            <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => navigation.navigate('SkillSelection')}
+            >
+                <Icon name="arrow-left" size={24} color="white" />
+            </TouchableOpacity>
             <View style={styles.content}>
                 <Logo width={55} height={55} style={styles.logo}/>
                 <Text style={styles.title}>Get Started</Text>
@@ -254,7 +277,7 @@ const styles = StyleSheet.create({
     title: {
         color: 'white',
         fontSize: 32,
-        fontFamily: 'MuseoModerno_400Regular',
+        fontFamily: 'MuseoModerno',
         marginBottom: 15,
     },
     progressBarContainer: {
@@ -265,7 +288,7 @@ const styles = StyleSheet.create({
     subtitle: {
         color: 'white',
         fontSize: 24,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         marginBottom: 30,
         textAlign: 'center',
     },
@@ -281,7 +304,7 @@ const styles = StyleSheet.create({
     questionText: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         marginBottom: 10,
     },
     selectButton: {
@@ -293,7 +316,7 @@ const styles = StyleSheet.create({
     selectButtonText: {
         color: '#666666',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         textAlign: 'left',
     },
     selectedText: {
@@ -311,7 +334,7 @@ const styles = StyleSheet.create({
     nextButtonText: {
         color: 'white',
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
     },
     waveContainer: {
         position: "absolute",
@@ -358,7 +381,7 @@ const styles = StyleSheet.create({
     modalButtonText: {
         fontSize: 16,
         color: '#007AFF',
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
     },
     confirmButton: {
         fontWeight: '600',
@@ -368,13 +391,19 @@ const styles = StyleSheet.create({
     },
     pickerItem: {
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
     },
     pickerPlaceholder: {
         fontSize: 16,
-        fontFamily: 'WorkSans_400Regular',
+        fontFamily: 'WorkSans',
         color: '#666666',
     },
+    backButton: {
+        position: 'absolute',
+        top: Platform.OS === 'ios' ? '8%' : 50, // Scales with screen height on iOS
+        left: '5%', // Scales with screen width
+        padding: 10, // Larger touch target
+    },  
 });
 
 export default VolunteerPreferences; 

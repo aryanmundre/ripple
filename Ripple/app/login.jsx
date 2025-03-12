@@ -15,9 +15,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 import { useNavigation } from "@react-navigation/native";
-import { useFonts } from 'expo-font';
-import { MuseoModerno_400Regular } from "@expo-google-fonts/museomoderno";
-import { WorkSans_400Regular } from "@expo-google-fonts/work-sans";
+import * as Font from 'expo-font';
 import SvgWave from "../assets/icons/Wave.svg";  
 import { API_ENDPOINTS, handleApiError } from "../constants/api";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -36,11 +34,18 @@ export default function LogInSignUp() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
 
-    const [fontsLoaded] = useFonts({
-        'MuseoModerno': MuseoModerno_400Regular,
-        'WorkSans': WorkSans_400Regular,
-    });
+    React.useEffect(() => {
+        async function loadFonts() {
+            await Font.loadAsync({
+                'MuseoModerno': require('../assets/fonts/MuseoModerno-Regular.ttf'),
+                'WorkSans': require('../assets/fonts/WorkSans-Regular.ttf'),
+            });
+            setFontsLoaded(true);
+        }
+        loadFonts();
+    }, []);
 
     const handleLogin = async () => {
         if (!username || !password) {
@@ -67,13 +72,10 @@ export default function LogInSignUp() {
             if (response.ok) {
                 // Store the token
                 if (data.token) {
-                    await AsyncStorage.setItem('authToken', data.token);
+                    await AsyncStorage.setItem('userToken', data.token);
                     await AsyncStorage.setItem('userData', JSON.stringify(data.user));
                 }
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: 'Main' }],
-                });
+                navigation.navigate("Main");
             } else {
                 const errorMessage = data.detail || 
                     (typeof data === 'object' ? JSON.stringify(data) : 'Login failed. Please check your credentials.');
@@ -126,11 +128,10 @@ export default function LogInSignUp() {
                             <Icon name="user" size={20} color="#666666" style={styles.inputIcon} />
                             <TextInput
                                 style={styles.input}
-                                placeholder="Email"
+                                placeholder="Username"
+                                placeholderTextColor="#666666"
                                 value={username}
                                 onChangeText={setUsername}
-                                autoCapitalize="none"
-                                testID="username-input"
                             />
                         </View>
 
@@ -139,10 +140,10 @@ export default function LogInSignUp() {
                             <TextInput
                                 style={styles.input}
                                 placeholder="Password"
+                                placeholderTextColor="#666666"
+                                secureTextEntry={!showPassword}
                                 value={password}
                                 onChangeText={setPassword}
-                                secureTextEntry={!showPassword}
-                                testID="password-input"
                             />
                             <TouchableOpacity 
                                 onPress={() => setShowPassword(!showPassword)}
@@ -166,7 +167,6 @@ export default function LogInSignUp() {
                         <TouchableOpacity
                             style={styles.loginButton}
                             onPress={handleLogin}
-                            testID="login-button"
                         >
                             <Text style={styles.loginButtonText}>Log In</Text>
                         </TouchableOpacity>
