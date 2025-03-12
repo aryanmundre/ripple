@@ -1,14 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, FlatList, ScrollView, SafeAreaView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
+import { View, Text, TextInput, ScrollView, SafeAreaView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
 // import Orientation from 'react-native-orientation-locker';
 import * as ScreenOrientation from 'expo-screen-orientation';
-import { useNavigation, useRoute } from '@react-navigation/native'
 import OrgCard from '../../components/explore/OrgCard.jsx';
 import { COLORS, icons, images, SIZES } from "../../constants";
-import styles from '../../styles/test.js';
 import * as Font from 'expo-font';
 
-// import MuseoModerno from '../../assets/fonts/MuseoModerno-SemiBold.ttf;'
 
 import Container from '../../assets/icons/Container.svg'
 import SearchIcon from '../../assets/icons/Search.svg';
@@ -71,14 +68,14 @@ const ExploreCards = () => {
     for (let i = 0; i < actions.length; i += 2) {
       const row = (
         <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-          <OrgCard width={width} organization={{
+          {actions[i] && (<OrgCard width={width} organization={{
             id: actions[i].id,
             title: actions[i].name,
             headerImage: actions[i].thumbnail,
             name: actions[i].organization,
             category: actions[i].category,
             action_type: actions[i].action_type
-          }} />
+          }} />)}
           {i + 1 < actions.length && (
             <OrgCard width={width} organization={{
               id: actions[i + 1].id,

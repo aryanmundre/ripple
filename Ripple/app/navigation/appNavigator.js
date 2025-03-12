@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { View, StyleSheet } from 'react-native';
 import { COLORS } from "../../constants";
-import ExploreCards from '../explore/explorecards';
+import ExploreCards from '../explore/explorecards.js';
 import OrgDetails from '../explore/orgDetails'
 import VisualizationScreen from '../visualizationScreen';
 import LeaderboardScreen from '../leaderboardScreen';
