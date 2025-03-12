@@ -128,7 +128,7 @@ export default function LogInSignUp() {
                             <Icon name="user" size={20} color="#666666" style={styles.inputIcon} />
                             <TextInput
                                 style={styles.input}
-                                placeholder="Username"
+                                placeholder="Email"
                                 placeholderTextColor="#666666"
                                 value={username}
                                 onChangeText={setUsername}
