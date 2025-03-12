@@ -150,6 +150,8 @@ const LocationSetup = () => {
                 <TouchableOpacity
                     style={styles.backButton}
                     onPress={() => navigation.navigate('AccountSetup')}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    activeOpacity={0.7}
                 >
                     <Icon name="arrow-left" size={24} color="white" />
                 </TouchableOpacity>
@@ -339,9 +341,11 @@ const styles = StyleSheet.create({
     },
     backButton: {
         position: 'absolute',
-        top: Platform.OS === 'ios' ? '8%' : 50, // Scales with screen height on iOS
-        left: '5%', // Scales with screen width
-        padding: 10, // Larger touch target
+        top: Platform.OS === 'ios' ? '8%' : 50,
+        left: '5%',
+        padding: 10,
+        zIndex: 10,
+        backgroundColor: 'transparent',
     },
 });
 

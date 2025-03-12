@@ -9,6 +9,7 @@ import {
     TouchableOpacity,
     ScrollView,
     Platform,
+    Alert,
 } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import * as Font from 'expo-font';
@@ -19,6 +20,7 @@ import Logo from "../assets/icons/logo.svg";
 import SvgWave from "../assets/icons/Wave.svg";
 import CheckBox from "../assets/icons/checkbox.svg";
 import CheckBoxSelected from "../assets/icons/checkbox-selected.svg";
+import Icon from "react-native-vector-icons/Feather";
 
 const { width, height } = Dimensions.get('window');
 
@@ -47,6 +49,10 @@ export default function SkillSelection() {
     }, []);
 
     const handleNext = () => {
+        if (selectedSkills.length === 0) {
+            Alert.alert('Error', 'Please select at least one skill');
+            return;
+        }
         navigation.navigate('VolunteerPreferences');
     };
 
@@ -78,6 +84,8 @@ export default function SkillSelection() {
             <TouchableOpacity
                 style={styles.backButton}
                 onPress={() => navigation.navigate('CauseSelection')}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                activeOpacity={0.7}
             >
                 <Icon name="arrow-left" size={24} color="white" />
             </TouchableOpacity>
@@ -239,8 +247,10 @@ const styles = StyleSheet.create({
     },
     backButton: {
         position: 'absolute',
-        top: Platform.OS === 'ios' ? '8%' : 50, // Scales with screen height on iOS
-        left: '5%', // Scales with screen width
-        padding: 10, // Larger touch target
+        top: Platform.OS === 'ios' ? '8%' : 50,
+        left: '5%',
+        padding: 10,
+        zIndex: 10,
+        backgroundColor: 'transparent',
     },
 }); 

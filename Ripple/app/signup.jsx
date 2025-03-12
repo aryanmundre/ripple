@@ -80,7 +80,7 @@ const SignupScreen = () => {
                 {/* Back Button */}
                 <TouchableOpacity
                     style={styles.backButton}
-                    onPress={() => navigation.goBack()}
+                    onPress={() => navigation.navigate('Signin')}
                 >
                     <Icon name="arrow-left" size={24} color="white" />
                 </TouchableOpacity>

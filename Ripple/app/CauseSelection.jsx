@@ -9,6 +9,7 @@ import {
     TouchableOpacity,
     ScrollView,
     Platform,
+    Alert,
 } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import * as Font from 'expo-font';
@@ -18,7 +19,7 @@ import ProgressBar from "../assets/icons/progressBar4.svg";
 import Logo from "../assets/icons/logo.svg"; 
 import SvgWave from "../assets/icons/Wave.svg";  
 import ImagePlaceholder from "../assets/icons/imageplaceholder.svg";
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from "react-native-vector-icons/Feather";
 
 const { width, height } = Dimensions.get('window');
 
@@ -48,6 +49,10 @@ export default function CauseSelection() {
     }, []);
 
     const handleNext = () => {
+        if (selectedCauses.length === 0) {
+            Alert.alert('Error', 'Please select at least one cause');
+            return;
+        }
         navigation.navigate('SkillSelection');
     };
 
@@ -75,13 +80,6 @@ export default function CauseSelection() {
 
     return (
         <SafeAreaView style={styles.container}>
-            {/* Back Button */}
-            <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => navigation.navigate('LocationSetup')}
-            >
-                <Icon name="arrow-left" size={24} color="white" />
-            </TouchableOpacity>
             <View style={styles.content}>
                 <Logo width={55} height={55} style={styles.logo}/>
                 <Text style={styles.title}>Get Started</Text>
@@ -262,11 +260,5 @@ const styles = StyleSheet.create({
         right: 0,
         zIndex: 0,
         pointerEvents: 'none',
-    },
-    backButton: {
-        position: 'absolute',
-        top: Platform.OS === 'ios' ? '8%' : 50, // Scales with screen height on iOS
-        left: '5%', // Scales with screen width
-        padding: 10, // Larger touch target
     },
 }); 
