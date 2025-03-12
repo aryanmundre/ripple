@@ -69,10 +69,11 @@ const OrgDetails = () => {
 
    return (     
        <SafeAreaView style={[styles.container, { backgroundColor: 'transparent' }]}>
+        <TouchableOpacity onPress={()=>{navigation.navigate('ExploreHome')}} style={{position:'absolute', marginTop: '17.5%', marginLeft: '5%', zIndex: 2}}> 
+            <BackArrow/>
+        </TouchableOpacity>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
            <View style={styles.imageContainer}>
-                <TouchableOpacity onPress={()=>{navigation.navigate('ExploreHome')}} style={{position:'absolute', padding:'5%', paddingTop:'7%'}}> 
-                    <BackArrow/>
-                </TouchableOpacity>
                <Image
                    source={{ uri: action.thumbnail }}
                    style={styles.headerImage}
@@ -90,8 +91,6 @@ const OrgDetails = () => {
                </TouchableOpacity>
            </View>
 
-
-           <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
                <View style={styles.content}>
                    {/* Title Section */}
                    <View style={styles.header}>
