@@ -14,6 +14,7 @@ import Waves from '../../assets/background/explore_wave.svg';
 
 const ExploreCards = () => {
   const [actions, setActions] = useState([]);
+  const [filteredActions, setFilteredActions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchMode, setSearchMode] = useState(false);
   const [search, setSearch] = useState('');
@@ -36,6 +37,7 @@ const ExploreCards = () => {
       const response = await fetch('https://ripple-z6px.onrender.com/api/actions/feed/');
       const data = await response.json();
       setActions(data.results);
+      setFilteredActions(data.results);
       setNextPage(data.next);
       setLoading(false);
     } catch (error) {
@@ -44,13 +46,30 @@ const ExploreCards = () => {
     }
   };
 
+  const handleSearch = (text) => {
+    setSearch(text);
+    if (!text.trim()) {
+      setFilteredActions(actions);
+      return;
+    }
+
+    const searchTerms = text.toLowerCase().split(' ');
+    const filtered = actions.filter(action => {
+      const searchString = `${action.name} ${action.organization} ${action.category} ${action.action_type}`.toLowerCase();
+      return searchTerms.every(term => searchString.includes(term));
+    });
+    setFilteredActions(filtered);
+  };
+
   const loadMoreActions = async () => {
     if (!nextPage) return;
     
     try {
       const response = await fetch(nextPage);
       const data = await response.json();
-      setActions([...actions, ...data.results]);
+      const newActions = [...actions, ...data.results];
+      setActions(newActions);
+      setFilteredActions(searchMode ? handleSearch(search) : newActions);
       setNextPage(data.next);
     } catch (error) {
       console.error('Error loading more actions:', error);
@@ -64,26 +83,27 @@ const ExploreCards = () => {
   }, []);
 
   const renderActionCards = () => {
+    const actionsToRender = searchMode ? filteredActions : actions;
     const rows = [];
-    for (let i = 0; i < actions.length; i += 2) {
+    for (let i = 0; i < actionsToRender.length; i += 2) {
       const row = (
         <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-          {actions[i] && (<OrgCard width={width} organization={{
-            id: actions[i].id,
-            title: actions[i].name,
-            headerImage: actions[i].thumbnail,
-            name: actions[i].organization,
-            category: actions[i].category,
-            action_type: actions[i].action_type
+          {actionsToRender[i] && (<OrgCard width={width} organization={{
+            id: actionsToRender[i].id,
+            title: actionsToRender[i].name,
+            headerImage: actionsToRender[i].thumbnail,
+            name: actionsToRender[i].organization,
+            category: actionsToRender[i].category,
+            action_type: actionsToRender[i].action_type
           }} />)}
-          {i + 1 < actions.length && (
+          {i + 1 < actionsToRender.length && (
             <OrgCard width={width} organization={{
-              id: actions[i + 1].id,
-              title: actions[i + 1].name,
-              headerImage: actions[i + 1].thumbnail,
-              name: actions[i + 1].organization,
-              category: actions[i + 1].category,
-              action_type: actions[i + 1].action_type
+              id: actionsToRender[i + 1].id,
+              title: actionsToRender[i + 1].name,
+              headerImage: actionsToRender[i + 1].thumbnail,
+              name: actionsToRender[i + 1].organization,
+              category: actionsToRender[i + 1].category,
+              action_type: actionsToRender[i + 1].action_type
             }} />
           )}
         </View>
@@ -92,6 +112,14 @@ const ExploreCards = () => {
     }
     return rows;
   };
+
+  const NoResultsMessage = () => (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+      <Text style={{ color: '#B8E1EB', fontSize: 16, fontFamily: 'default-font' }}>
+        No activities found for "{search}"
+      </Text>
+    </View>
+  );
 
   return(
     <SafeAreaView style={{flex: 1, backgroundColor: COLORS.bg_color}}>
@@ -104,22 +132,27 @@ const ExploreCards = () => {
         (<>
           {/* search bar header */}
           <View style={{flexDirection: 'row', marginLeft: 8, marginTop: 8, marginRight: 15, zIndex: 1}}>
-            <TouchableOpacity onPress={()=>{setSearchMode(false)}}>
+            <TouchableOpacity onPress={()=>{
+              setSearchMode(false);
+              setSearch('');
+              setFilteredActions(actions);
+            }}>
               <BackArrow width={40} height={40} style={{top: 5}}/>
             </TouchableOpacity>
             <TextInput
                 style={{ flex: 1, height: 40, margin: '2%', paddingLeft: 6, paddingRight: 6, color: 'rgb(39, 39, 39)', borderColor: 'rgba(153, 72, 72, 0.2)', borderRadius: 10, backgroundColor: COLORS.lightWhite}}
-                placeholder="Search..."
+                placeholder="Search activities..."
                 placeholderTextColor={'rgb(39, 39, 39)'}
                 value={search}
                 ref={searchRef}
-                onChangeText={setSearch}
+                onChangeText={handleSearch}
+                autoFocus={true}
             />
           </View>  
           
           {/* generated content */}
           <ScrollView contentContainerStyle={{}}>
-            {renderActionCards()}
+            {filteredActions.length > 0 ? renderActionCards() : <NoResultsMessage />}
           </ScrollView>
         </>)
         :
@@ -138,7 +171,7 @@ const ExploreCards = () => {
             <TouchableOpacity>
               <Container width={40} height={40}/>
             </TouchableOpacity>
-            <Text style={{alignItems: 'center', fontSize: 36, fontWeight: '600', color: COLORS.lightWhite, fontFamily: 'default-font'}}>Explore</Text>
+            <Text style={{alignItems: 'center', fontSize: 34, fontWeight: '600', color: COLORS.lightWhite, fontFamily: 'default-font'}}>Explore</Text>
             <TouchableOpacity
               onPress={()=>{ setSearchMode(true); setTimeout(()=> {if(searchRef.current){searchRef.current.focus()}}, 100); }}
             >

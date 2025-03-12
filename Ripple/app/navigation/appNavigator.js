@@ -17,6 +17,7 @@ import LocationSetup from '../LocationSetup';
 import CauseSelection from '../CauseSelection';
 import SkillSelection from '../SkillSelection';
 import VolunteerPreferences from '../VolunteerPreferences';
+import { verticalScale } from '../../utils/scaling';
 
 import SvgExplore from '../../assets/icons/Compass.svg';
 import SvgHeart from '../../assets/icons/Heart.svg';
@@ -46,24 +47,31 @@ const ProfileNavigator = () => (
 const TabNavigator = () => (
     <Tab.Navigator
         screenOptions={{
-            tabBarStyle: { backgroundColor: COLORS.lightWhite, height: 60 },
+            tabBarStyle: { 
+                backgroundColor: COLORS.lightWhite, 
+                height: verticalScale(70),
+                paddingTop: verticalScale(3)
+            },
             tabBarActiveTintColor: COLORS.primary,
             tabBarInactiveTintColor: 'gray',
             tabBarShowLabel: false,
             headerShown: false,
-        }}
+            tabBarIconStyle: {
+                marginBottom: verticalScale(3)
+            }
+        }}      
     >
         <Tab.Screen name="Explore" component={ExploreNavigator} options={{
-            tabBarIcon: ({ size, color }) => <SvgExplore width={size} height={size} fill={color} />
+            tabBarIcon: ({ size, color }) => <SvgExplore width={verticalScale(size)} height={verticalScale(size)} fill={color} />
         }}/>
         <Tab.Screen name="Visualization" component={VisualizationScreen}  options={{
-            tabBarIcon: ({ size, color }) => <SvgHeart width={size} height={size} fill={color} />
+            tabBarIcon: ({ size, color }) => <SvgHeart width={verticalScale(size)} height={verticalScale(size)} fill={color} />
         }}/>
         <Tab.Screen name="Leaderboard" component={LeaderboardScreen}  options={{
-            tabBarIcon: ({ size, color }) => <SvgGame width={size} height={size} fill={color} />
+            tabBarIcon: ({ size, color }) => <SvgGame width={verticalScale(size)} height={verticalScale(size)} fill={color} />
         }}/>
         <Tab.Screen name="Profile" component={ProfileNavigator} options={{
-            tabBarIcon: ({ size, color }) => <SvgProfile width={size} height={size} fill={color} />
+            tabBarIcon: ({ size, color }) => <SvgProfile width={verticalScale(size)} height={verticalScale(size)} fill={color} />
         }}/>
     </Tab.Navigator>
 );
