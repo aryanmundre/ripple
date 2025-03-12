@@ -97,11 +97,11 @@ const AccountSetup = () => {
     const onDateChange = (date) => {
         if (date) {
             const selectedDate = new Date(date);
-            const formattedDate = selectedDate.toLocaleDateString('en-US', {
-                month: '2-digit',
-                day: '2-digit',
-                year: 'numeric'
-            });
+            // Format date as YYYY-MM-DD
+            const year = selectedDate.getFullYear();
+            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+            const day = String(selectedDate.getDate()).padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
             setDateOfBirth(formattedDate);
         }
         setShowCalendar(false);
